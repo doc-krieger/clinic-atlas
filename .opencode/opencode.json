@@ -1,0 +1,10 @@
+{
+  "permission": {
+    "read": {
+      "/home/wihan/Projects/clinic-atlas/.opencode/get-shit-done/*": "allow"
+    },
+    "external_directory": {
+      "/home/wihan/Projects/clinic-atlas/.opencode/get-shit-done/*": "allow"
+    }
+  }
+}
