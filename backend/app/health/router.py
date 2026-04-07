@@ -20,6 +20,7 @@ router = APIRouter(prefix="/api", tags=["health"])
 def get_settings() -> Settings:
     return Settings()
 
+
 # Short timeout for health probes — combined must stay under container's 5s budget
 HEALTH_PROBE_TIMEOUT = 2.0
 
@@ -78,9 +79,7 @@ async def health(session: Session = Depends(get_session)):
     # Overall: "error" if any required service reports error,
     # "degraded" if optional services are down, "ok" if all green
     required_ok = all(
-        checks[k].get("status") == "ok"
-        for k in checks
-        if k in REQUIRED_SERVICES
+        checks[k].get("status") == "ok" for k in checks if k in REQUIRED_SERVICES
     )
     all_ok = all(checks[k].get("status") == "ok" for k in checks)
 

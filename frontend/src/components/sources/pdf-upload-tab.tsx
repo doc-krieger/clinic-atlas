@@ -18,7 +18,7 @@ export function PdfUploadTab({ onSourceAdded }: PdfUploadTabProps) {
   const [state, setState] = useState<UploadState>("idle")
   const [progress, setProgress] = useState<IngestionProgress | null>(null)
   const [errorMessage, setErrorMessage] = useState("")
-  const [completeData, setCompleteData] = useState<IngestionComplete | null>(null)
+  const [, setCompleteData] = useState<IngestionComplete | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)

@@ -18,7 +18,9 @@ class IngestionComplete(BaseModel):
     page_count: Optional[int] = None
     content_preview: str  # First 500 chars (D-13)
     source_type: str
-    quality_flags: list[str] = []  # Persisted: ["scanned_pdf", "thin_content", "js_fallback_used"]
+    quality_flags: list[
+        str
+    ] = []  # Persisted: ["scanned_pdf", "thin_content", "js_fallback_used"]
 
 
 # Request models (D-14)

@@ -61,9 +61,7 @@ def downgrade() -> None:
     op.drop_index("ix_raw_sources_content_hash", table_name="raw_sources")
     op.drop_constraint("uq_raw_sources_content_hash", "raw_sources", type_="unique")
     # Re-create original non-unique index
-    op.create_index(
-        "ix_raw_sources_content_hash", "raw_sources", ["content_hash"]
-    )
+    op.create_index("ix_raw_sources_content_hash", "raw_sources", ["content_hash"])
 
     # Drop columns in reverse order
     op.drop_column("raw_sources", "quality_flags")

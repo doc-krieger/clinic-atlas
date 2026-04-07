@@ -3,7 +3,9 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # Database
-    database_url: str = "postgresql://clinic_atlas:clinic_atlas_dev@localhost:5432/clinic_atlas"
+    database_url: str = (
+        "postgresql://clinic_atlas:clinic_atlas_dev@localhost:5432/clinic_atlas"
+    )
 
     # Data paths (D-25)
     clinic_atlas_notes_dir: str = "/data/notes"

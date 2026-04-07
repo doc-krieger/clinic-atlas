@@ -179,9 +179,7 @@ def upgrade() -> None:
         ) STORED;
         """
     )
-    op.execute(
-        "CREATE INDEX idx_notes_search ON notes USING GIN (search_vector);"
-    )
+    op.execute("CREATE INDEX idx_notes_search ON notes USING GIN (search_vector);")
 
     # Raw sources: single-weight search
     op.execute(

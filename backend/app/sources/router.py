@@ -69,9 +69,7 @@ def _sse_to_bytes(event: ServerSentEvent) -> bytes:
 @router.get("")
 def list_sources(session: Session = Depends(get_session)):
     """Return all ingested sources, most recent first."""
-    sources = session.exec(
-        select(RawSource).order_by(desc(RawSource.created_at))
-    ).all()
+    sources = session.exec(select(RawSource).order_by(desc(RawSource.created_at))).all()
     return {
         "sources": [
             SourceListItem(
@@ -112,7 +110,9 @@ async def upload_pdf(
 
     # Validate MIME type (T-02-01)
     if file.content_type and not file.content_type.startswith("application/pdf"):
-        raise HTTPException(status_code=400, detail="File must be a PDF (application/pdf).")
+        raise HTTPException(
+            status_code=400, detail="File must be a PDF (application/pdf)."
+        )
 
     # Validate file size (D-03)
     if file.size and file.size > settings.max_upload_size_mb * 1024 * 1024:

@@ -134,7 +134,11 @@ class TestPdfUpload:
 
     @patch("app.sources.service.get_converter")
     def test_scanned_pdf_detection(
-        self, mock_get_converter, client: TestClient, session: Session, override_settings
+        self,
+        mock_get_converter,
+        client: TestClient,
+        session: Session,
+        override_settings,
     ):
         """SRCI-03: Scanned/image PDF flagged with warning status and persisted quality_flags."""
         short_markdown = "x" * 20  # 20 chars across 5 pages = 4 chars/page (< 50)
@@ -170,7 +174,11 @@ class TestPdfUpload:
 
     @patch("app.sources.service.get_converter")
     def test_duplicate_pdf_rejection(
-        self, mock_get_converter, client: TestClient, session: Session, override_settings
+        self,
+        mock_get_converter,
+        client: TestClient,
+        session: Session,
+        override_settings,
     ):
         """D-02: Duplicate content hash rejected with existing source ID."""
         markdown = "# Duplicate Test\n\nSame content for dedup testing. " * 10

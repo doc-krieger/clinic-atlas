@@ -97,7 +97,9 @@ def validate_url_safety(url: str) -> None:
 def validate_upload_size(content_length: int, max_mb: int) -> None:
     """Raise 413 if content exceeds the upload limit."""
     if content_length > max_mb * 1024 * 1024:
-        raise HTTPException(status_code=413, detail=f"This file exceeds the {max_mb} MB limit.")
+        raise HTTPException(
+            status_code=413, detail=f"This file exceeds the {max_mb} MB limit."
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -118,7 +120,9 @@ def _error_event(**fields) -> ServerSentEvent:
     return ServerSentEvent(data=fields, event="error")
 
 
-def _complete_event(source: RawSource, markdown: str, quality_flags: list[str]) -> ServerSentEvent:
+def _complete_event(
+    source: RawSource, markdown: str, quality_flags: list[str]
+) -> ServerSentEvent:
     """Create a complete SSE event (D-13)."""
     return ServerSentEvent(
         data=IngestionComplete(
@@ -188,7 +192,9 @@ async def parse_pdf(
             author = doc.metadata.get("author") or None
             doc.close()
         except ImportError:
-            logger.info("PyMuPDF (fitz) not available; skipping PDF metadata extraction")
+            logger.info(
+                "PyMuPDF (fitz) not available; skipping PDF metadata extraction"
+            )
         except Exception:
             logger.warning("Could not extract PDF metadata from %s", filename)
 
@@ -286,7 +292,9 @@ async def fetch_and_parse_url(
 
         # Enforce max response size (T-02-10)
         if len(resp.content) > settings.max_response_size_mb * 1024 * 1024:
-            yield _error_event(error=f"Response exceeds {settings.max_response_size_mb} MB limit.")
+            yield _error_event(
+                error=f"Response exceeds {settings.max_response_size_mb} MB limit."
+            )
             return
 
         yield _progress_event("extracting", "Extracting content...")
@@ -294,7 +302,9 @@ async def fetch_and_parse_url(
         # Parse HTML with docling in threadpool
         converter = get_converter()
         result = await asyncio.to_thread(
-            lambda: converter.convert_string(content=resp.text, format=InputFormat.HTML, name="page")
+            lambda: converter.convert_string(
+                content=resp.text, format=InputFormat.HTML, name="page"
+            )
         )
         markdown = result.document.export_to_markdown()
 
@@ -325,13 +335,19 @@ async def fetch_and_parse_url(
 
                     await context.route("**/*", _route_handler)
                     page = await context.new_page()
-                    await page.goto(url, wait_until="networkidle", timeout=settings.playwright_timeout)
+                    await page.goto(
+                        url,
+                        wait_until="networkidle",
+                        timeout=settings.playwright_timeout,
+                    )
                     html = await page.content()
                     await browser.close()
 
                 # Re-parse with docling
                 result = await asyncio.to_thread(
-                    lambda: converter.convert_string(content=html, format=InputFormat.HTML, name="page")
+                    lambda: converter.convert_string(
+                        content=html, format=InputFormat.HTML, name="page"
+                    )
                 )
                 new_markdown = result.document.export_to_markdown()
 
@@ -341,7 +357,9 @@ async def fetch_and_parse_url(
                     quality_flags.append("js_fallback_used")
                 else:
                     # Still thin -- keep thin_content flag, use longer version if available
-                    markdown = new_markdown if len(new_markdown) > len(markdown) else markdown
+                    markdown = (
+                        new_markdown if len(new_markdown) > len(markdown) else markdown
+                    )
 
             except Exception as pw_err:
                 logger.warning("Playwright fallback failed for %s: %s", url, pw_err)

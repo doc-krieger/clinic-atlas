@@ -43,7 +43,9 @@ def load_source_registry(path: str) -> SourceRegistry:
         logger.warning("Source registry file is empty: %s", path)
         return SourceRegistry()
     if not isinstance(raw, dict):
-        logger.warning("Source registry is not a mapping (got %s): %s", type(raw).__name__, path)
+        logger.warning(
+            "Source registry is not a mapping (got %s): %s", type(raw).__name__, path
+        )
         return SourceRegistry()
     validated = {}
     for category in ["guidelines", "textbooks", "journals", "formularies"]:
@@ -58,9 +60,7 @@ def load_source_registry(path: str) -> SourceRegistry:
             continue
         for item in raw_category:
             if not isinstance(item, dict):
-                logger.warning(
-                    "Skipping non-mapping entry in %s: %r", category, item
-                )
+                logger.warning("Skipping non-mapping entry in %s: %r", category, item)
                 continue
             try:
                 entries.append(SourceEntry(category=category, **item))
