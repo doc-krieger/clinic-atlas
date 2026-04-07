@@ -26,6 +26,7 @@ services:
       - ./data/notes:/data/notes
       - ./data/sources:/data/sources
       - ./config:/config:ro
+      - docling_models:/home/appuser/.cache
     ports:
       - "8000:8000"
     environment:
@@ -93,3 +94,4 @@ services:
 volumes:
   postgres_data:
   ollama_data:
+  docling_models:
