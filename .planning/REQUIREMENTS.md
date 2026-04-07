@@ -99,9 +99,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| KBSE-01 | Phase 1 | Pending |
-| KBSE-02 | Phase 1 | Pending |
-| SRCI-04 | Phase 1 | Pending |
+| KBSE-01 | Phase 1 | Done |
+| KBSE-02 | Phase 1 | Done |
+| SRCI-04 | Phase 1 | Done |
 | SRCI-01 | Phase 2 | Pending |
 | SRCI-02 | Phase 2 | Pending |
 | SRCI-03 | Phase 2 | Pending |

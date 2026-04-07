@@ -12,7 +12,9 @@ Every query compounds the knowledge base. Unlike ChatGPT where each session star
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Curated trusted source registry (YAML config) — Phase 1 (SRCI-04)
+- [x] Postgres full-text search over knowledge base (tsvector + GIN indexes) — Phase 1 (KBSE-01)
+- [x] Medical abbreviation synonym dictionary improves FTS recall — Phase 1 (KBSE-02)
 
 ### Active
 
@@ -106,4 +108,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-06 after initialization*
+*Last updated: 2026-04-07 after Phase 1 completion*
