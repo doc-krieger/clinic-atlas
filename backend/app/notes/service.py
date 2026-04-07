@@ -41,39 +41,36 @@ def reindex_from_disk(session: Session, notes_dir: str) -> dict:
             try:
                 post = frontmatter.load(file_path)
                 slug = post.metadata.get("slug", filename[:-3])
-                nested = session.begin_nested()
-                existing = session.exec(
-                    select(Note).where(Note.slug == slug)
-                ).first()
-                if existing:
-                    existing.title = post.metadata.get("title", slug)
-                    existing.content = post.content
-                    existing.type = note_type
-                    existing.status = NoteStatus(
-                        post.metadata.get("status", "draft")
-                    )
-                    existing.tags = post.metadata.get("tags", [])
-                    existing.version = post.metadata.get("version", 1)
-                    session.add(existing)
-                else:
-                    note = Note(
-                        slug=slug,
-                        title=post.metadata.get("title", slug),
-                        content=post.content,
-                        type=note_type,
-                        status=NoteStatus(
+                with session.begin_nested():
+                    existing = session.exec(
+                        select(Note).where(Note.slug == slug)
+                    ).first()
+                    if existing:
+                        existing.title = post.metadata.get("title", slug)
+                        existing.content = post.content
+                        existing.type = note_type
+                        existing.status = NoteStatus(
                             post.metadata.get("status", "draft")
-                        ),
-                        tags=post.metadata.get("tags", []),
-                        version=post.metadata.get("version", 1),
-                    )
-                    session.add(note)
-                session.flush()
-                nested.commit()
+                        )
+                        existing.tags = post.metadata.get("tags", [])
+                        existing.version = post.metadata.get("version", 1)
+                        session.add(existing)
+                    else:
+                        note = Note(
+                            slug=slug,
+                            title=post.metadata.get("title", slug),
+                            content=post.content,
+                            type=note_type,
+                            status=NoteStatus(
+                                post.metadata.get("status", "draft")
+                            ),
+                            tags=post.metadata.get("tags", []),
+                            version=post.metadata.get("version", 1),
+                        )
+                        session.add(note)
+                    session.flush()
                 stats["upserted"] += 1
             except Exception as e:
-                if "nested" in locals():
-                    nested.rollback()
                 stats["errors"].append({"file": file_path, "error": str(e)})
                 logger.warning("Reindex error for %s: %s", file_path, e)
     session.commit()
