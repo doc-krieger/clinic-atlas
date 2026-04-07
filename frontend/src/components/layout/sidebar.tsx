@@ -3,12 +3,15 @@
 import { useEffect, useState } from "react"
 import { Separator } from "@/components/ui/separator"
 import { useTheme } from "next-themes"
-import { Moon, Sun } from "lucide-react"
+import { usePathname } from "next/navigation"
+import Link from "next/link"
+import { Moon, Sun, MessageSquare, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { fetchHealth } from "@/lib/api"
 
 export function Sidebar() {
   const { theme, setTheme } = useTheme()
+  const pathname = usePathname()
   const [mounted, setMounted] = useState(false)
   const [healthStatus, setHealthStatus] = useState<
     "loading" | "ok" | "degraded" | "error" | "unavailable"
@@ -47,9 +50,30 @@ export function Sidebar() {
 
       <Separator />
 
-      {/* Nav placeholder */}
-      <nav className="flex-1 px-4 py-4">
-        <p className="px-2 text-xs text-muted-foreground">Navigation</p>
+      {/* Navigation */}
+      <nav className="flex-1 px-4 py-4 space-y-1">
+        <Link
+          href="/chat"
+          className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm ${
+            pathname === "/chat"
+              ? "bg-accent text-accent-foreground"
+              : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+          }`}
+        >
+          <MessageSquare className="h-4 w-4" />
+          Chat
+        </Link>
+        <Link
+          href="/sources"
+          className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm ${
+            pathname === "/sources"
+              ? "bg-accent text-accent-foreground"
+              : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+          }`}
+        >
+          <FileText className="h-4 w-4" />
+          Sources
+        </Link>
       </nav>
 
       <Separator />
