@@ -23,4 +23,12 @@ class Settings(BaseSettings):
     # CORS
     cors_origins: list[str] = ["http://localhost:3000"]
 
+    # Source ingestion (Phase 2)
+    max_upload_size_mb: int = 50  # D-03: 50 MB file size limit
+    docling_ocr_enabled: bool = False  # D-06: OCR disabled by default
+    httpx_timeout: float = 30.0  # URL fetch timeout
+    playwright_timeout: int = 30000  # Playwright page.goto timeout (ms)
+    max_response_size_mb: int = 20  # Max response size for URL fetch
+    max_redirects: int = 5  # Redirect cap for SSRF protection
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
