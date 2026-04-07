@@ -149,7 +149,19 @@ A self-hosted, chat-first clinical knowledge assistant that researches trusted s
 <!-- GSD:conventions-start source:CONVENTIONS.md -->
 ## Conventions
 
-Conventions not yet established. Will populate as patterns emerge during development.
+### Makefile
+
+Use `make <target>` for common operations instead of running raw docker compose / pytest / ruff commands:
+
+- `make up` / `make down` — start/stop all containers
+- `make test` — run all tests (backend + frontend)
+- `make test-backend` / `make test-frontend` — run tests for one stack
+- `make lint` / `make fmt` — lint check / auto-format
+- `make migrate` — run pending Alembic migrations
+- `make migrate-new msg="..."` — generate a new migration
+- `make shell-backend` / `make shell-db` — drop into container shells
+- `make clean` — stop containers and delete volumes
+- `make` (no args) — show all available targets
 <!-- GSD:conventions-end -->
 
 <!-- GSD:architecture-start source:ARCHITECTURE.md -->
