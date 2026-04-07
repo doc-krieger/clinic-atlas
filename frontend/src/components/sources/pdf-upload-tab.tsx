@@ -51,11 +51,11 @@ export function PdfUploadTab({ onSourceAdded }: PdfUploadTabProps) {
             onProgress: (data) => setProgress(data),
             onComplete: (data) => {
               setCompleteData(data)
+              onSourceAdded()
               if (data.quality_flags.includes("scanned_pdf")) {
                 setState("warning")
               } else {
                 setState("complete")
-                onSourceAdded()
               }
             },
             onError: (error, existingSourceId) => {
