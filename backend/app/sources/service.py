@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 def get_converter() -> DocumentConverter:
     pipeline_options = PdfPipelineOptions()
     pipeline_options.do_ocr = False  # D-06: OCR disabled by default
-    pipeline_options.do_table_structure = True
+    pipeline_options.do_table_structure = False  # Avoid model downloads at runtime
     pipeline_options.do_code_enrichment = False
     pipeline_options.do_formula_enrichment = False
     pipeline_options.document_timeout = 300.0  # 5 min for large PDFs
@@ -198,8 +198,8 @@ async def parse_pdf(
         except Exception:
             logger.warning("Could not extract PDF metadata from %s", filename)
 
-        # D-04: Extract title -- try docling result name, fall back to filename stem
-        title = getattr(result.document, "name", None) or Path(filename).stem
+        # D-04: Extract title -- prefer original filename stem (docling name is the temp path)
+        title = Path(filename).stem
 
         # Save raw PDF to disk (T-02-01: hash-based filename prevents path traversal)
         # Atomic write: write to .tmp suffix, then os.replace()
@@ -299,19 +299,43 @@ async def fetch_and_parse_url(
 
         yield _progress_event("extracting", "Extracting content...")
 
-        # Parse HTML with docling in threadpool
+        # Detect content type — PDFs fetched by URL should use the PDF pipeline
+        content_type = resp.headers.get("content-type", "")
+        is_pdf = "application/pdf" in content_type or url.lower().endswith(".pdf")
+
         converter = get_converter()
-        result = await asyncio.to_thread(
-            lambda: converter.convert_string(
-                content=resp.text, format=InputFormat.HTML, name="page"
+
+        if is_pdf:
+            # Save to temp file and parse as PDF
+            import tempfile
+
+            tmp_fd, tmp_path = tempfile.mkstemp(suffix=".pdf")
+            os.write(tmp_fd, resp.content)
+            os.close(tmp_fd)
+            try:
+                result = await asyncio.to_thread(converter.convert, tmp_path)
+            finally:
+                os.unlink(tmp_path)
+        else:
+            # Parse HTML with docling in threadpool
+            result = await asyncio.to_thread(
+                lambda: converter.convert_string(
+                    content=resp.text, format=InputFormat.HTML, name="page"
+                )
             )
-        )
         markdown = result.document.export_to_markdown()
 
         quality_flags: list[str] = []
 
-        # D-07: Thin content check
-        if len(markdown) < 200:
+        if is_pdf:
+            # PDF-specific: check for scanned content
+            page_count = len(result.document.pages)
+            avg_chars = len(markdown) / max(page_count, 1)
+            if avg_chars < 50:
+                quality_flags.append("scanned_pdf")
+
+        # D-07: Thin content check (applies to HTML; skip for PDFs)
+        if not is_pdf and len(markdown) < 200:
             quality_flags.append("thin_content")
 
             # D-08: JS fallback -- retry with Playwright
@@ -365,11 +389,16 @@ async def fetch_and_parse_url(
                 logger.warning("Playwright fallback failed for %s: %s", url, pw_err)
                 # Keep original thin content, proceed with what we have
 
-        # D-09: Extract title
+        # D-09: Extract title (temp filenames from PDF conversion are not useful)
         title = getattr(result.document, "name", None)
-        if not title or title == "page":
+        if not title or title == "page" or title.startswith("tmp"):
             parsed_url = urlparse(url)
-            title = f"{parsed_url.netloc}{parsed_url.path}".rstrip("/")
+            # Use the filename from the URL path if it looks meaningful
+            path_stem = Path(parsed_url.path).stem
+            if path_stem and len(path_stem) > 3 and not path_stem.startswith("tmp"):
+                title = path_stem.replace("-", " ").replace("_", " ").strip()
+            else:
+                title = f"{parsed_url.netloc}{parsed_url.path}".rstrip("/")
 
         # D-02: Duplicate check by content hash
         content_hash = hashlib.sha256(markdown.encode()).hexdigest()
@@ -383,7 +412,7 @@ async def fetch_and_parse_url(
             )
             return
 
-        parse_status = "warning" if "thin_content" in quality_flags else "parsed"
+        parse_status = "warning" if quality_flags else "parsed"
 
         # Create RawSource record
         source = RawSource(
@@ -392,8 +421,9 @@ async def fetch_and_parse_url(
             url=url,
             title=title,
             author=None,
-            mime_type="text/html",
+            mime_type="application/pdf" if is_pdf else "text/html",
             parse_status=parse_status,
+            page_count=len(result.document.pages) if is_pdf else None,
             source_type="url",
             quality_flags=quality_flags,
         )

@@ -2,9 +2,9 @@
 
 import json
 import os
+import tempfile
 from collections.abc import AsyncGenerator
 from functools import lru_cache
-from uuid import uuid4
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.routing import format_sse_event
@@ -121,11 +121,8 @@ async def upload_pdf(
             detail=f"This file exceeds the {settings.max_upload_size_mb} MB limit.",
         )
 
-    # Save uploaded file to temp path
-    sources_dir = settings.clinic_atlas_sources_dir
-    os.makedirs(sources_dir, exist_ok=True)
-    tmp_filename = f".tmp_{uuid4()}.pdf"
-    tmp_path = os.path.join(sources_dir, tmp_filename)
+    # Save uploaded file to temp path (use /tmp — bind mount may be root-owned)
+    tmp_fd, tmp_path = tempfile.mkstemp(suffix=".pdf")
 
     try:
         content = await file.read()
@@ -139,8 +136,8 @@ async def upload_pdf(
             detail=f"This file exceeds the {settings.max_upload_size_mb} MB limit.",
         )
 
-    with open(tmp_path, "wb") as f:
-        f.write(content)
+    os.write(tmp_fd, content)
+    os.close(tmp_fd)
 
     async def generate() -> AsyncGenerator[bytes, None]:
         try:
