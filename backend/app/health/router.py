@@ -73,7 +73,6 @@ async def health(session: Session = Depends(get_session)):
     ]:
         checks[f"disk_{name}"] = {
             "status": "ok" if os.path.isdir(path) else "error",
-            "path": path,
         }
 
     # Overall: "error" if any required service reports error,
