@@ -61,9 +61,11 @@ Exceptions: Sidebar width is 256px (16 * 16). Message input area minimum height 
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 14px | 400 (regular) | 1.5 |
-| Label | 12px | 500 (medium) | 1.4 |
+| Label | 12px | 400 (regular) | 1.4 |
 | Heading | 18px | 600 (semibold) | 1.2 |
 | Display | 24px | 600 (semibold) | 1.2 |
+
+**Weight budget:** 2 weights only — 400 (regular) and 600 (semibold). Labels are differentiated from body text by size (12px vs 14px), not weight.
 
 **Rationale:** 14px body is standard for dense information-display tools (Linear, Raycast, VS Code). 12px labels for sidebar items and metadata. 18px headings for section titles. 24px display for the page/route title only.
 
@@ -99,6 +101,8 @@ Dark mode is the default theme (D-41). All hex values below are for dark mode. L
 
 Phase 1 delivers a static layout skeleton. No functional chat — just the visual shell.
 
+**Primary focal point:** Empty state card, centered vertically and horizontally in the main content area. This is the first element the user's eye should land on after page load.
+
 ```
 +------------------+----------------------------------------+
 |                  |                                        |
@@ -107,7 +111,7 @@ Phase 1 delivers a static layout skeleton. No functional chat — just the visua
 |                  |   +----------------------------+       |
 |  App title       |   |                            |       |
 |  Nav placeholder |   |    Empty state message      |       |
-|                  |   |                            |       |
+|                  |   |    [FOCAL POINT]            |       |
 |                  |   +----------------------------+       |
 |                  |                                        |
 |                  |   +----------------------------+       |
