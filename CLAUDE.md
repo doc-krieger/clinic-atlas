@@ -162,6 +162,18 @@ Use `make <target>` for common operations instead of running raw docker compose 
 - `make shell-backend` / `make shell-db` — drop into container shells
 - `make clean` — stop containers and delete volumes
 - `make` (no args) — show all available targets
+
+### Context7 (Documentation Lookup)
+
+Always use the Context7 CLI (`npx ctx7@latest`) to fetch current documentation when working with any library, framework, SDK, or API in this project — even well-known ones. This applies to API syntax, configuration, version migration, setup instructions, and CLI usage. Do not rely on training data alone; prefer Context7 over web search for library docs.
+
+Steps:
+1. `npx ctx7@latest library <name> "<question>"` — resolve the library ID
+2. Pick the best match by name, description, and snippet count
+3. `npx ctx7@latest docs <libraryId> "<question>"` — fetch docs
+4. Answer using the fetched documentation
+
+Use proactively whenever generating code that depends on a library API, not only when the user asks.
 <!-- GSD:conventions-end -->
 
 <!-- GSD:architecture-start source:ARCHITECTURE.md -->
