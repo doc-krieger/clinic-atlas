@@ -1,6 +1,6 @@
 ---
 phase: 01-foundation
-reviewed: 2026-04-07T12:00:00Z
+reviewed: 2026-04-07T18:30:00Z
 depth: standard
 files_reviewed: 37
 files_reviewed_list:
@@ -45,67 +45,68 @@ files_reviewed_list:
   - scripts/init-postgres.sql
 findings:
   critical: 1
-  warning: 6
+  warning: 5
   info: 3
-  total: 10
+  total: 9
 status: issues_found
 ---
 
 # Phase 1: Code Review Report
 
-**Reviewed:** 2026-04-07T12:00:00Z
+**Reviewed:** 2026-04-07T18:30:00Z
 **Depth:** standard
 **Files Reviewed:** 37
 **Status:** issues_found
 
 ## Summary
 
-The Phase 1 foundation codebase is well-structured overall. The backend follows clear module boundaries (health, notes, search, sources), the Alembic migration correctly sets up FTS with a medical thesaurus, and the frontend shell is minimal and clean. Docker Compose wiring is consistent with the architecture plan.
-
-Key concerns: one hardcoded secret in SearXNG config, deprecated `datetime.utcnow` usage across all models, missing `updated_at` auto-update logic, and a partial-commit risk in the reindex service. The thesaurus file has duplicate abbreviation keys that will cause unpredictable PostgreSQL behavior.
+Phase 1 foundation is solid overall. The database schema, FTS pipeline with medical thesaurus, source registry, health checks, and frontend shell are all well-structured. One critical issue exists with double Alembic migration execution. Several warnings relate to error handling edge cases in the reindex service and the sources router re-parsing YAML on every request. Frontend code is clean and appropriately minimal for a scaffold phase.
 
 ## Critical Issues
 
-### CR-01: Hardcoded SearXNG Secret Key
+### CR-01: Double Alembic migration execution on startup
 
-**File:** `config/searxng/settings.yml:4`
-**Issue:** The SearXNG `secret_key` is hardcoded as `"clinic-atlas-dev-key-change-in-production"`. While the comment-in-name suggests changing it, this value is committed to git. If this config is ever used in a non-local context, the secret is exposed. SearXNG uses this key for CSRF protection and session signing.
-**Fix:**
-```yaml
-server:
-  secret_key: "${SEARXNG_SECRET_KEY}"
-  bind_address: "0.0.0.0"
-  port: 8080
+**File:** `backend/app/main.py:24-34` and `docker-compose.yml:38`
+**Issue:** The `docker-compose.yml` command runs `uv run alembic upgrade head` before starting uvicorn, and then the FastAPI lifespan handler in `main.py` also runs `alembic upgrade head` via `subprocess.run`. This means migrations execute twice on every container start. While Alembic is idempotent for already-applied migrations, the subprocess call spawns a separate Python process that creates its own database connection and Settings instance, which adds latency and unnecessary load. More importantly, if the subprocess migration fails (e.g., transient DB error), the application raises `RuntimeError` and refuses to start -- even though the docker-compose command already succeeded. This creates a confusing failure mode.
+**Fix:** Remove one of the two migration invocations. Since docker-compose already runs migrations before `exec uvicorn`, remove the subprocess call from the lifespan:
+```python
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Migrations are run by docker-compose command before uvicorn starts.
+    # For non-Docker environments, run `alembic upgrade head` manually.
+
+    # D-21: Auto-create directories on startup
+    for dir_path in [
+        os.path.join(settings.clinic_atlas_notes_dir, "topics"),
+        # ...
+    ]:
+        os.makedirs(dir_path, exist_ok=True)
+    # ...
+    yield
 ```
-Then set `SEARXNG_SECRET_KEY` as an environment variable in `docker-compose.yml` under the searxng service, defaulting to a fixed dev value:
-```yaml
-environment:
-  SEARXNG_SECRET_KEY: ${SEARXNG_SECRET_KEY:-clinic-atlas-dev-key-change-in-production}
-```
-For production, generate a key beforehand (`openssl rand -hex 32`) and export it as `SEARXNG_SECRET_KEY` before running `docker compose up`. Alternatively, generate the key at container startup via an entrypoint script. At minimum, add a comment in `.env` reminding to override this for any non-local deployment.
+Alternatively, keep only the lifespan migration and simplify the docker-compose command to just `exec uv run uvicorn ...`.
 
 ## Warnings
 
-### WR-01: Deprecated `datetime.utcnow` Usage
+### WR-01: Source registry re-loaded from disk on every request
 
-**File:** `backend/app/notes/models.py:34-35`
-**File:** `backend/app/sources/models.py:19-20`
-**Issue:** `datetime.utcnow` is deprecated since Python 3.12 (the project requires Python 3.13). It returns a naive datetime without timezone info, which can cause subtle bugs when comparing with timezone-aware datetimes. Python 3.12+ emits a `DeprecationWarning` and it will be removed in a future version.
-**Fix:**
+**File:** `backend/app/sources/router.py:16-17`
+**Issue:** `get_registry` is a plain function (not cached), so every `GET /api/sources/registry` request re-reads and re-parses `sources.yml` from disk. While harmless at low traffic, this is wasteful and inconsistent with the lifespan preload in `main.py:50-54` which loads the registry but discards the result.
+**Fix:** Cache the registry using `lru_cache` or store it in `app.state` during lifespan:
 ```python
-from datetime import datetime, timezone
-
-# In Note model:
-created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+@lru_cache
+def get_registry(sources_file: str = "") -> SourceRegistry:
+    if not sources_file:
+        sources_file = get_settings().clinic_atlas_sources_file
+    return load_source_registry(sources_file)
 ```
-Apply the same change to `RawSource` in `backend/app/sources/models.py:19-20`.
+Note: `lru_cache` requires hashable arguments, so pass the path as a string rather than the Settings object.
 
-### WR-02: `reindex_from_disk` Commits Partial Results on Error
+### WR-02: Fragile `nested` variable check in reindex error handler
 
-**File:** `backend/app/notes/service.py:74`
-**Issue:** The `session.commit()` at line 74 runs unconditionally after the loop, even if some files raised exceptions. This means partial results are committed to the database alongside error records in the stats dict. If a file parse error corrupts the session state (e.g., an integrity error from a duplicate slug), the commit will fail entirely and no notes get indexed -- but the error is not caught at this level.
-**Fix:** Wrap individual upserts in savepoints so one bad file does not block others:
+**File:** `backend/app/notes/service.py:75-76`
+**Issue:** The except block checks `if "nested" in locals()` to decide whether to rollback the savepoint. This is fragile -- if the variable name changes during refactoring, or if the exception occurs after `nested.commit()` (line 72), attempting rollback on an already-committed savepoint will raise a new exception. Additionally, if `session.begin_nested()` itself throws (line 44), `nested` is never assigned, and the `locals()` check correctly skips rollback, but this pattern is error-prone.
+**Fix:** Use a try/except inside the loop with explicit savepoint management:
 ```python
 for filename in os.listdir(dir_path):
     if not filename.endswith(".md"):
@@ -113,142 +114,77 @@ for filename in os.listdir(dir_path):
     stats["scanned"] += 1
     file_path = os.path.join(dir_path, filename)
     try:
-        nested = session.begin_nested()  # SAVEPOINT
-        post = frontmatter.load(file_path)
-        # ... upsert logic ...
-        nested.commit()
+        with session.begin_nested():
+            post = frontmatter.load(file_path)
+            slug = post.metadata.get("slug", filename[:-3])
+            existing = session.exec(
+                select(Note).where(Note.slug == slug)
+            ).first()
+            if existing:
+                existing.title = post.metadata.get("title", slug)
+                # ... update fields ...
+                session.add(existing)
+            else:
+                note = Note(slug=slug, ...)
+                session.add(note)
+            session.flush()
         stats["upserted"] += 1
     except Exception as e:
-        nested.rollback()
         stats["errors"].append({"file": file_path, "error": str(e)})
         logger.warning("Reindex error for %s: %s", file_path, e)
-session.commit()
 ```
+Using `with session.begin_nested()` as a context manager ensures automatic rollback on exception.
 
-### WR-03: `updated_at` Column Never Auto-Updates
+### WR-03: `updated_at` onupdate lambda may not trigger via SQLModel
 
-**File:** `backend/alembic/versions/001_initial_schema.py:78-82`
-**File:** `backend/app/notes/models.py:35`
-**Issue:** The `updated_at` column has `server_default=sa.func.now()` which only applies on INSERT. There is no database trigger and no application-level logic to update this column when a row is modified. The `default_factory=datetime.utcnow` in the SQLModel only applies when creating new Python objects, not on database UPDATE. This means `updated_at` will always equal `created_at`.
-**Fix:** Either add a database trigger in the migration:
-```sql
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+**File:** `backend/app/notes/models.py:36-38` and `backend/app/sources/models.py:22-24`
+**Issue:** The `sa_column_kwargs={"onupdate": ...}` is passed alongside `default_factory`, but SQLModel's `Field` with `sa_column_kwargs` can have surprising interactions. More importantly, `onupdate` on the Column only fires for ORM-level `UPDATE` statements that go through SQLAlchemy's unit-of-work. If updates happen via raw SQL (e.g., bulk operations or future search service queries), `updated_at` will not be updated. The migration also does not set a database-level trigger for `updated_at`.
+**Fix:** Consider adding a database trigger in the migration for `updated_at`, or document that `updated_at` only updates through ORM operations. For now, this is acceptable for Phase 1 where all writes go through SQLModel, but should be addressed before Phase 2 adds more write paths.
 
-CREATE TRIGGER tr_notes_updated_at BEFORE UPDATE ON notes
-FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+### WR-04: Health endpoint exposes internal paths in response
 
-CREATE TRIGGER tr_raw_sources_updated_at BEFORE UPDATE ON raw_sources
-FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-```
-Or set `updated_at` explicitly in the reindex service and any future update paths:
+**File:** `backend/app/health/router.py:74-77`
+**Issue:** The disk volume checks include `"path": path` in the JSON response, exposing internal filesystem paths (e.g., `/data/notes`, `/data/sources`) to any caller. While this is a single-user self-hosted app, it is a security hygiene issue that would matter if the app is ever exposed beyond localhost.
+**Fix:** Remove the `path` field from the health response, or gate it behind a debug/admin flag:
 ```python
-existing.updated_at = datetime.now(timezone.utc)
+checks[f"disk_{name}"] = {
+    "status": "ok" if os.path.isdir(path) else "error",
+}
 ```
 
-### WR-04: Duplicate Abbreviation Keys in Medical Thesaurus
+### WR-05: SearXNG secret_key is hardcoded in committed config
 
-**File:** `config/medical_thesaurus.ths`
-**Issue:** Several abbreviations appear multiple times with different expansions. PostgreSQL thesaurus dictionaries use the last definition when duplicates exist, so earlier definitions are silently overridden. Affected keys include:
-- `tb` (line 82 "tuberculosis", line 239 "tuberculosis") -- same expansion, harmless but redundant
-- `sbp` (line 22 "systolic blood pressure", line 182 "spontaneous bacterial peritonitis") -- only one will apply
-- `pe` (line 15 "pulmonary embolism", line 669 "pulmonary embolism physical examination") -- different expansions
-- `gcs` (line 123, line 342) -- duplicate
-- `sz` (line 125 "seizure", line 477 "schizophrenia") -- only one will apply
-- `bpd` (line 100, line 440) -- "bronchopulmonary dysplasia" vs same
-- `dvt` (line 14, line 511) -- duplicate
-- `ngt` (line 165, line 515) -- duplicate
-- `ct` (line 141, line 517 "chest tube", line 584 "computed tomography") -- conflicting meanings
-- `cbc`, `crp`, `esr` (duplicated between Infectious Disease and Labs sections)
-
-**Fix:** Consolidate duplicate entries. For genuinely ambiguous abbreviations, use a single entry with all expansions (like the "Ambiguous Abbreviations" section already does for `ms`, `as`, etc.):
+**File:** `config/searxng/settings.yml:4`
+**Issue:** `secret_key: "clinic-atlas-dev-key-change-in-production"` is hardcoded in the repository. While the comment says "change in production" and this is a dev-only self-hosted tool, the key is still committed to version control. If this repo is open-sourced (stated intent), anyone using it without changing the key gets the same SearXNG secret.
+**Fix:** Move the secret key to an environment variable:
+```yaml
+server:
+  secret_key: "${SEARXNG_SECRET_KEY}"
 ```
-sbp : systolic blood pressure spontaneous bacterial peritonitis
-sz : seizure schizophrenia
-ct : computed tomography chest tube
-```
-
-### WR-05: Source Registry Re-Loaded From Disk on Every Request
-
-**File:** `backend/app/sources/router.py:10-12`
-**Issue:** `GET /api/sources/registry` calls `load_source_registry()` on every request, which reads and parses the YAML file from disk each time. The registry is also loaded at startup in `main.py:50` but that result is discarded (not stored anywhere accessible). This creates unnecessary I/O and means the startup validation is wasted.
-**Fix:** Cache the registry at startup and serve from memory:
-```python
-# In main.py lifespan:
-app.state.source_registry = load_source_registry(settings.clinic_atlas_sources_file)
-
-# In sources/router.py:
-from fastapi import Request
-
-@router.get("/registry")
-def get_registry(request: Request):
-    registry = request.app.state.source_registry
-    return {
-        "sources": [s.model_dump() for s in registry.all_sources],
-        "count": len(registry.all_sources),
-    }
-```
-
-### WR-06: Health Endpoint Overall Status Logic Has Incorrect Check
-
-**File:** `backend/app/health/router.py:76-78`
-**Issue:** The condition `checks[k].get("status") in ("ok", None)` on line 77-78 checks whether any non-postgres check status is `None`, but the status is always set to a string value ("ok", "degraded", "error", "unavailable") in every code path above. The `None` case is dead logic that obscures the intent. More importantly, "unavailable" is not in the set `("ok", None)`, so any unavailable optional service (ollama, searxng) correctly triggers "degraded". However, a missing `disk_notes` or `disk_sources` directory (status="error") also only triggers "degraded" -- disk errors should arguably be "error" since notes storage is critical to the application.
-**Fix:** Remove the dead `None` check and separate critical vs optional services:
-```python
-postgres_ok = checks.get("postgres", {}).get("status") == "ok"
-disk_ok = all(
-    checks[k].get("status") == "ok"
-    for k in checks if k.startswith("disk_")
-)
-if not postgres_ok or not disk_ok:
-    overall = "error"
-elif all(checks[k].get("status") == "ok" for k in checks):
-    overall = "ok"
-else:
-    overall = "degraded"
-```
+Or generate it dynamically in docker-compose. At minimum, document in a setup guide that this must be changed.
 
 ## Info
 
-### IN-01: Dark Mode CSS Mixes oklch and hsl Color Formats
+### IN-01: Unused import in main.py
 
-**File:** `frontend/src/app/globals.css:87-121`
-**Issue:** The `:root` (light mode) block uses `oklch()` color values, but the `.dark` block uses raw `hsl` component numbers (e.g., `240 10% 4%`). While this works because Tailwind/shadcn interprets these as hsl components, it creates inconsistency with the light mode block and the chart variables within dark mode which still use `oklch()`. This makes maintenance harder and could cause confusion.
-**Fix:** Use a consistent color format across both light and dark mode blocks. Either convert all to oklch or all to hsl component format.
+**File:** `backend/app/main.py:4`
+**Issue:** `subprocess` is imported and used for the Alembic migration call. If CR-01 is resolved by removing the subprocess migration, this import becomes dead code.
+**Fix:** Remove `import subprocess` if the subprocess migration call is removed.
 
-### IN-02: Settings Object Instantiated Multiple Times
+### IN-02: Test file uses hardcoded config path
 
-**File:** `backend/app/health/router.py:21`
-**File:** `backend/app/sources/router.py:11`
-**File:** `backend/app/main.py:16`
-**File:** `backend/app/database.py:5`
-**Issue:** `Settings()` is instantiated in four different locations. While pydantic-settings caches environment reads, each call creates a new object and re-parses `.env`. This is not a bug but creates unnecessary work and makes it harder to override settings in tests.
-**Fix:** Use a single `get_settings` dependency or a module-level singleton pattern. FastAPI's dependency injection with `lru_cache` is the standard approach:
-```python
-from functools import lru_cache
+**File:** `backend/tests/test_source_registry.py:8-9`
+**Issue:** `_SOURCES_PATH = _settings.clinic_atlas_sources_file` resolves to `/config/sources.yml` (the Docker path). Tests that run outside Docker (e.g., local `pytest`) will fail if this path does not exist. The test suite depends on the Docker environment being available.
+**Fix:** This is acceptable for the stated test strategy (D-47: tests run against real Postgres in Docker), but consider documenting this dependency or providing a fallback for CI environments.
 
-@lru_cache
-def get_settings() -> Settings:
-    return Settings()
-```
+### IN-03: `pyproject.toml` specifies `sqlmodel>=0.0.38` but CLAUDE.md references `0.0.24`
 
-### IN-03: Test Source Registry Test Uses Hardcoded Relative Path
-
-**File:** `backend/tests/test_source_registry.py:11`
-**Issue:** `load_source_registry("config/sources.yml")` uses a relative path, which assumes tests are always run from the project root. This will break if tests are run from the `backend/` directory.
-**Fix:** Use a path relative to the test file or a fixture that resolves the correct path:
-```python
-import os
-SOURCES_YML = os.path.join(os.path.dirname(__file__), "..", "..", "config", "sources.yml")
-```
+**File:** `backend/pyproject.toml:8`
+**Issue:** The pinned version `>=0.0.38` is newer than the `0.0.24` documented in CLAUDE.md. This is not a bug (newer is fine), but the documentation is outdated.
+**Fix:** Update CLAUDE.md to reflect the actual pinned version, or note that the constraint allows newer releases.
 
 ---
 
-_Reviewed: 2026-04-07T12:00:00Z_
+_Reviewed: 2026-04-07T18:30:00Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
