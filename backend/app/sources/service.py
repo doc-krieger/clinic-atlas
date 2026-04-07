@@ -3,7 +3,6 @@
 import asyncio
 import hashlib
 import ipaddress
-import json
 import logging
 import os
 import socket
@@ -12,7 +11,6 @@ from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlparse
 
-import fitz  # PyMuPDF -- transitive docling dep, used for metadata extraction (D-04)
 import httpx
 from docling.datamodel.base_models import InputFormat
 from docling.datamodel.pipeline_options import PdfPipelineOptions
@@ -103,6 +101,41 @@ def validate_upload_size(content_length: int, max_mb: int) -> None:
 
 
 # ---------------------------------------------------------------------------
+# SSE helpers -- pass dicts to ServerSentEvent.data (FastAPI JSON-encodes them)
+# ---------------------------------------------------------------------------
+
+
+def _progress_event(status: str, message: str, **kwargs) -> ServerSentEvent:
+    """Create a progress SSE event."""
+    return ServerSentEvent(
+        data=IngestionProgress(status=status, message=message, **kwargs).model_dump(),
+        event="progress",
+    )
+
+
+def _error_event(**fields) -> ServerSentEvent:
+    """Create an error SSE event."""
+    return ServerSentEvent(data=fields, event="error")
+
+
+def _complete_event(source: RawSource, markdown: str, quality_flags: list[str]) -> ServerSentEvent:
+    """Create a complete SSE event (D-13)."""
+    return ServerSentEvent(
+        data=IngestionComplete(
+            id=source.id,
+            title=source.title,
+            author=source.author,
+            parse_status=source.parse_status,
+            page_count=source.page_count,
+            content_preview=markdown[:500],
+            source_type=source.source_type,
+            quality_flags=quality_flags,
+        ).model_dump(),
+        event="complete",
+    )
+
+
+# ---------------------------------------------------------------------------
 # PDF ingestion (SRCI-01, SRCI-03, D-01, D-02, D-04)
 # ---------------------------------------------------------------------------
 
@@ -118,11 +151,7 @@ async def parse_pdf(
     Yields ServerSentEvent objects with event types: progress, complete, error.
     """
     try:
-        # Progress: parsing
-        yield ServerSentEvent(
-            data=IngestionProgress(status="parsing", message="Parsing document...").model_dump_json(),
-            event="progress",
-        )
+        yield _progress_event("parsing", "Parsing document...")
 
         # Run docling in threadpool (Pitfall 1: CPU-bound, must not block event loop)
         converter = get_converter()
@@ -144,21 +173,22 @@ async def parse_pdf(
             select(RawSource).where(RawSource.content_hash == content_hash)
         ).first()
         if existing:
-            yield ServerSentEvent(
-                data=json.dumps({
-                    "error": "This document has already been ingested.",
-                    "existing_source_id": existing.id,
-                }),
-                event="error",
+            yield _error_event(
+                error="This document has already been ingested.",
+                existing_source_id=existing.id,
             )
             return
 
         # D-04: Extract author from PDF metadata via PyMuPDF (reliable metadata access)
         author = None
         try:
+            import fitz
+
             doc = fitz.open(str(file_path))
             author = doc.metadata.get("author") or None
             doc.close()
+        except ImportError:
+            logger.info("PyMuPDF (fitz) not available; skipping PDF metadata extraction")
         except Exception:
             logger.warning("Could not extract PDF metadata from %s", filename)
 
@@ -170,12 +200,11 @@ async def parse_pdf(
         sources_dir = Path(settings.clinic_atlas_sources_dir)
         sources_dir.mkdir(parents=True, exist_ok=True)
         disk_path = str(sources_dir / f"{content_hash}.pdf")
-        tmp_path = f"{disk_path}.tmp"
-        # Copy from temp upload to permanent location
-        with open(file_path, "rb") as src, open(tmp_path, "wb") as dst:
+        tmp_disk_path = f"{disk_path}.tmp"
+        with open(file_path, "rb") as src, open(tmp_disk_path, "wb") as dst:
             while chunk := src.read(8192):
                 dst.write(chunk)
-        os.replace(tmp_path, disk_path)
+        os.replace(tmp_disk_path, disk_path)
 
         # Create RawSource record
         source = RawSource(
@@ -201,42 +230,18 @@ async def parse_pdf(
             existing = session.exec(
                 select(RawSource).where(RawSource.content_hash == content_hash)
             ).first()
-            yield ServerSentEvent(
-                data=json.dumps({
-                    "error": "This document has already been ingested.",
-                    "existing_source_id": existing.id if existing else None,
-                }),
-                event="error",
+            yield _error_event(
+                error="This document has already been ingested.",
+                existing_source_id=existing.id if existing else None,
             )
             return
 
-        # Progress: indexing
-        yield ServerSentEvent(
-            data=IngestionProgress(status="indexing", message="Indexing...").model_dump_json(),
-            event="progress",
-        )
-
-        # Complete event (D-13)
-        yield ServerSentEvent(
-            data=IngestionComplete(
-                id=source.id,
-                title=source.title,
-                author=source.author,
-                parse_status=source.parse_status,
-                page_count=source.page_count,
-                content_preview=markdown[:500],
-                source_type="pdf",
-                quality_flags=quality_flags,
-            ).model_dump_json(),
-            event="complete",
-        )
+        yield _progress_event("indexing", "Indexing...")
+        yield _complete_event(source, markdown, quality_flags)
 
     except Exception as e:
         logger.exception("Error parsing PDF %s", filename)
-        yield ServerSentEvent(
-            data=json.dumps({"error": str(e)}),
-            event="error",
-        )
+        yield _error_event(error=str(e))
 
 
 # ---------------------------------------------------------------------------
@@ -258,17 +263,10 @@ async def fetch_and_parse_url(
         try:
             validate_url_safety(url)
         except UnsafeURLError as e:
-            yield ServerSentEvent(
-                data=json.dumps({"error": str(e)}),
-                event="error",
-            )
+            yield _error_event(error=str(e))
             return
 
-        # Progress: fetching
-        yield ServerSentEvent(
-            data=IngestionProgress(status="fetching", message="Fetching...").model_dump_json(),
-            event="progress",
-        )
+        yield _progress_event("fetching", "Fetching...")
 
         # Fetch with httpx
         async with httpx.AsyncClient(
@@ -283,25 +281,15 @@ async def fetch_and_parse_url(
         try:
             validate_url_safety(str(resp.url))
         except UnsafeURLError as e:
-            yield ServerSentEvent(
-                data=json.dumps({"error": f"Redirect destination unsafe: {e}"}),
-                event="error",
-            )
+            yield _error_event(error=f"Redirect destination unsafe: {e}")
             return
 
         # Enforce max response size (T-02-10)
         if len(resp.content) > settings.max_response_size_mb * 1024 * 1024:
-            yield ServerSentEvent(
-                data=json.dumps({"error": f"Response exceeds {settings.max_response_size_mb} MB limit."}),
-                event="error",
-            )
+            yield _error_event(error=f"Response exceeds {settings.max_response_size_mb} MB limit.")
             return
 
-        # Progress: extracting
-        yield ServerSentEvent(
-            data=IngestionProgress(status="extracting", message="Extracting content...").model_dump_json(),
-            event="progress",
-        )
+        yield _progress_event("extracting", "Extracting content...")
 
         # Parse HTML with docling in threadpool
         converter = get_converter()
@@ -317,12 +305,7 @@ async def fetch_and_parse_url(
             quality_flags.append("thin_content")
 
             # D-08: JS fallback -- retry with Playwright
-            yield ServerSentEvent(
-                data=IngestionProgress(
-                    status="extracting", message="Retrying with browser rendering..."
-                ).model_dump_json(),
-                event="progress",
-            )
+            yield _progress_event("extracting", "Retrying with browser rendering...")
 
             try:
                 from playwright.async_api import async_playwright
@@ -357,7 +340,7 @@ async def fetch_and_parse_url(
                     quality_flags.remove("thin_content")
                     quality_flags.append("js_fallback_used")
                 else:
-                    # Still thin -- keep thin_content flag, note JS was tried
+                    # Still thin -- keep thin_content flag, use longer version if available
                     markdown = new_markdown if len(new_markdown) > len(markdown) else markdown
 
             except Exception as pw_err:
@@ -376,12 +359,9 @@ async def fetch_and_parse_url(
             select(RawSource).where(RawSource.content_hash == content_hash)
         ).first()
         if existing:
-            yield ServerSentEvent(
-                data=json.dumps({
-                    "error": "This content has already been ingested.",
-                    "existing_source_id": existing.id,
-                }),
-                event="error",
+            yield _error_event(
+                error="This content has already been ingested.",
+                existing_source_id=existing.id,
             )
             return
 
@@ -409,39 +389,15 @@ async def fetch_and_parse_url(
             existing = session.exec(
                 select(RawSource).where(RawSource.content_hash == content_hash)
             ).first()
-            yield ServerSentEvent(
-                data=json.dumps({
-                    "error": "This content has already been ingested.",
-                    "existing_source_id": existing.id if existing else None,
-                }),
-                event="error",
+            yield _error_event(
+                error="This content has already been ingested.",
+                existing_source_id=existing.id if existing else None,
             )
             return
 
-        # Progress: indexing
-        yield ServerSentEvent(
-            data=IngestionProgress(status="indexing", message="Indexing...").model_dump_json(),
-            event="progress",
-        )
-
-        # Complete event (D-13)
-        yield ServerSentEvent(
-            data=IngestionComplete(
-                id=source.id,
-                title=source.title,
-                author=source.author,
-                parse_status=source.parse_status,
-                page_count=None,
-                content_preview=markdown[:500],
-                source_type="url",
-                quality_flags=quality_flags,
-            ).model_dump_json(),
-            event="complete",
-        )
+        yield _progress_event("indexing", "Indexing...")
+        yield _complete_event(source, markdown, quality_flags)
 
     except Exception as e:
         logger.exception("Error fetching URL %s", url)
-        yield ServerSentEvent(
-            data=json.dumps({"error": str(e)}),
-            event="error",
-        )
+        yield _error_event(error=str(e))
