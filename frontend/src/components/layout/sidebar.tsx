@@ -27,6 +27,8 @@ export function Sidebar() {
         setHealthStatus("ok")
       } else if (data.status === "degraded") {
         setHealthStatus("degraded")
+      } else if (data.status === "error") {
+        setHealthStatus("error")
       } else {
         setHealthStatus("unavailable")
       }

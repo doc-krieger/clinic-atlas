@@ -47,8 +47,13 @@ def test_raw_sources_table_has_expected_columns(session: Session):
         "id",
         "file_path",
         "url",
+        "title",
         "content",
         "content_hash",
+        "mime_type",
+        "parse_status",
+        "created_at",
+        "updated_at",
         "search_vector",
     }
     assert expected.issubset(columns), f"Missing columns: {expected - columns}"
@@ -79,13 +84,17 @@ def test_gin_indexes_exist(session: Session):
     """GIN indexes exist on search_vector columns."""
     result = session.exec(
         text("""
-            SELECT indexname FROM pg_indexes
+            SELECT indexname, indexdef FROM pg_indexes
             WHERE indexname IN ('idx_notes_search', 'idx_raw_sources_search')
         """)
     )
-    indexes = {row[0] for row in result}
+    indexes = {row[0]: row[1] for row in result}
     assert "idx_notes_search" in indexes, "Missing GIN index on notes.search_vector"
     assert "idx_raw_sources_search" in indexes, "Missing GIN index on raw_sources.search_vector"
+    assert "USING gin" in indexes["idx_notes_search"].lower() or "using gin" in indexes["idx_notes_search"], \
+        "idx_notes_search is not a GIN index"
+    assert "USING gin" in indexes["idx_raw_sources_search"].lower() or "using gin" in indexes["idx_raw_sources_search"], \
+        "idx_raw_sources_search is not a GIN index"
 
 
 def test_insert_note_via_sqlmodel(session: Session):

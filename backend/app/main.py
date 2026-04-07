@@ -31,9 +31,10 @@ async def lifespan(app: FastAPI):
             logger.info("Alembic migrations applied successfully")
         else:
             logger.error("Alembic migration failed: %s", result.stderr)
-            # Don't crash -- let health endpoint report degraded status
+            raise RuntimeError(f"Alembic migration failed: {result.stderr}")
     except FileNotFoundError:
-        logger.warning("Alembic not found -- skipping auto-migration (dev without uv?)")
+        logger.error("Alembic not found -- cannot verify database schema")
+        raise
 
     # D-21: Auto-create directories on startup
     for dir_path in [

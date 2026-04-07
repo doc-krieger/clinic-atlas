@@ -9,4 +9,8 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store pnpm install --froze
 
 COPY . .
 
+# Set ownership and switch to non-root user
+RUN chown -R node:node /app
+USER node
+
 CMD ["pnpm", "dev", "--hostname", "0.0.0.0"]

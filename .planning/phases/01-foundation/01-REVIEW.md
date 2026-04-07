@@ -77,12 +77,12 @@ server:
   bind_address: "0.0.0.0"
   port: 8080
 ```
-Then set `SEARXNG_SECRET_KEY` as an environment variable in `docker-compose.yml` under the searxng service, defaulting to a dev value:
+Then set `SEARXNG_SECRET_KEY` as an environment variable in `docker-compose.yml` under the searxng service, defaulting to a fixed dev value:
 ```yaml
 environment:
-  SEARXNG_SECRET_KEY: ${SEARXNG_SECRET_KEY:-$(openssl rand -hex 32)}
+  SEARXNG_SECRET_KEY: ${SEARXNG_SECRET_KEY:-clinic-atlas-dev-key-change-in-production}
 ```
-Alternatively, generate the key at container startup via an entrypoint script. At minimum, add a comment in `.env` reminding to override this for any non-local deployment.
+For production, generate a key beforehand (`openssl rand -hex 32`) and export it as `SEARXNG_SECRET_KEY` before running `docker compose up`. Alternatively, generate the key at container startup via an entrypoint script. At minimum, add a comment in `.env` reminding to override this for any non-local deployment.
 
 ## Warnings
 

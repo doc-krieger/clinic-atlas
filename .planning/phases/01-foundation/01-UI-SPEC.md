@@ -82,7 +82,7 @@ Dark mode is the default theme (D-41). All hex values below are for dark mode. L
 | Dominant (60%) | `hsl(240 10% 4%)` | `--background` | Page background, main content area |
 | Secondary (30%) | `hsl(240 6% 10%)` | `--card` / `--sidebar` | Sidebar, cards, message bubbles, input area |
 | Border | `hsl(240 4% 16%)` | `--border` | All borders, separators |
-| Muted text | `hsl(240 5% 46%)` | `--muted-foreground` | Placeholder text, timestamps, metadata |
+| Muted text | `hsl(240 5% 53%)` | `--muted-foreground` | Placeholder text, timestamps, metadata (≥4.5:1 contrast on bg+card) |
 | Primary text | `hsl(0 0% 93%)` | `--foreground` | Body text, headings |
 | Accent (10%) | `hsl(210 100% 60%)` | `--primary` | Primary CTA buttons, active sidebar item indicator, focus rings |
 | Destructive | `hsl(0 72% 51%)` | `--destructive` | Destructive actions only (none in Phase 1) |

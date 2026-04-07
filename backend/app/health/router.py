@@ -1,8 +1,10 @@
+import asyncio
 import logging
 import os
 
 import httpx
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from sqlmodel import Session, text
 
 from app.config import Settings
@@ -12,8 +14,11 @@ from app.notes.service import reindex_from_disk
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["health"])
 
-# Short timeout for health probes (addresses review concern: health endpoint timeouts)
-HEALTH_PROBE_TIMEOUT = 3.0
+# Short timeout for health probes — combined must stay under container's 5s budget
+HEALTH_PROBE_TIMEOUT = 2.0
+
+# Services where status=="error" means overall health is "error"
+REQUIRED_SERVICES = {"postgres", "disk_notes", "disk_sources"}
 
 
 @router.get("/health")
@@ -28,35 +33,32 @@ async def health(session: Session = Depends(get_session)):
     except Exception as e:
         checks["postgres"] = {"status": "error", "detail": str(e)}
 
-    # Ollama -- short timeout, reports "unavailable" not "error" for startup lag
-    try:
-        async with httpx.AsyncClient(timeout=HEALTH_PROBE_TIMEOUT) as client:
-            resp = await client.get(f"{settings.ollama_base_url}/api/tags")
-            checks["ollama"] = {
-                "status": "ok" if resp.status_code == 200 else "degraded"
-            }
-    except httpx.TimeoutException:
-        checks["ollama"] = {
-            "status": "unavailable",
-            "detail": "timeout after 3s",
-        }
-    except Exception:
-        checks["ollama"] = {"status": "unavailable"}
+    # Ollama + SearXNG — run concurrently to stay within probe budget
+    async def probe_ollama() -> dict:
+        try:
+            async with httpx.AsyncClient(timeout=HEALTH_PROBE_TIMEOUT) as client:
+                resp = await client.get(f"{settings.ollama_base_url}/api/tags")
+                return {"status": "ok" if resp.status_code == 200 else "degraded"}
+        except httpx.TimeoutException:
+            return {"status": "unavailable", "detail": "timeout after 2s"}
+        except Exception:
+            return {"status": "unavailable"}
 
-    # SearXNG -- short timeout, reports "unavailable" not "error" for startup lag
-    try:
-        async with httpx.AsyncClient(timeout=HEALTH_PROBE_TIMEOUT) as client:
-            resp = await client.get(f"{settings.searxng_url}/healthz")
-            checks["searxng"] = {
-                "status": "ok" if resp.status_code == 200 else "degraded"
-            }
-    except httpx.TimeoutException:
-        checks["searxng"] = {
-            "status": "unavailable",
-            "detail": "timeout after 3s",
-        }
-    except Exception:
-        checks["searxng"] = {"status": "unavailable"}
+    async def probe_searxng() -> dict:
+        try:
+            async with httpx.AsyncClient(timeout=HEALTH_PROBE_TIMEOUT) as client:
+                resp = await client.get(f"{settings.searxng_url}/healthz")
+                return {"status": "ok" if resp.status_code == 200 else "degraded"}
+        except httpx.TimeoutException:
+            return {"status": "unavailable", "detail": "timeout after 2s"}
+        except Exception:
+            return {"status": "unavailable"}
+
+    ollama_result, searxng_result = await asyncio.gather(
+        probe_ollama(), probe_searxng()
+    )
+    checks["ollama"] = ollama_result
+    checks["searxng"] = searxng_result
 
     # Disk volumes
     for name, path in [
@@ -68,21 +70,25 @@ async def health(session: Session = Depends(get_session)):
             "path": path,
         }
 
-    # Overall: "ok" if postgres is up, "degraded" if postgres up but optional
-    # services down, "error" if postgres is down
-    postgres_ok = checks.get("postgres", {}).get("status") == "ok"
-    if not postgres_ok:
-        overall = "error"
-    elif all(
-        checks[k].get("status") in ("ok", None)
+    # Overall: "error" if any required service reports error,
+    # "degraded" if optional services are down, "ok" if all green
+    required_ok = all(
+        checks[k].get("status") == "ok"
         for k in checks
-        if k != "postgres"
-    ):
+        if k in REQUIRED_SERVICES
+    )
+    all_ok = all(checks[k].get("status") == "ok" for k in checks)
+
+    if not required_ok:
+        overall = "error"
+    elif all_ok:
         overall = "ok"
     else:
         overall = "degraded"
 
-    return {"status": overall, "checks": checks}
+    body = {"status": overall, "checks": checks}
+    status_code = 503 if overall == "error" else 200
+    return JSONResponse(content=body, status_code=status_code)
 
 
 @router.post("/reindex")

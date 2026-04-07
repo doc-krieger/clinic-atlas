@@ -42,7 +42,7 @@ created: 2026-04-07
 | 1-01-02 | 01 | 1 | KBSE-02 | — | N/A | integration | `docker compose exec backend uv run pytest tests/test_schema.py` | ❌ W0 | ⬜ pending |
 | 1-01-03 | 01 | 1 | KBSE-02 | — | N/A | integration | `docker compose exec backend uv run pytest tests/test_fts.py` | ❌ W0 | ⬜ pending |
 | 1-01-04 | 01 | 1 | SRCI-04 | — | N/A | unit | `docker compose exec backend uv run pytest tests/test_source_registry.py` | ❌ W0 | ⬜ pending |
-| 1-01-05 | 01 | 1 | KBSE-01 | — | N/A | integration | `curl -s http://localhost:8000/api/reindex | jq .status` | ❌ W0 | ⬜ pending |
+| 1-01-05 | 01 | 1 | KBSE-01 | — | N/A | integration | `curl -sX POST http://localhost:8000/api/reindex \| jq .status` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -62,7 +62,7 @@ created: 2026-04-07
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| SearXNG returns search results | SRCI-04 | Requires running SearXNG container with network access | `curl 'http://localhost:8080/search?q=test&format=json'` and verify JSON response |
+| SearXNG returns search results | SRCI-04 | Requires running SearXNG container with network access | `curl 'http://localhost:8888/search?q=test&format=json'` and verify JSON response |
 
 ---
 

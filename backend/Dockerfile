@@ -17,4 +17,10 @@ RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev
 # Copy application code
 COPY . .
 
+# Create non-root user and set ownership
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser \
+    && chown -R appuser:appgroup /app
+
+USER appuser
+
 CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

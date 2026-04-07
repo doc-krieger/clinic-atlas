@@ -1,6 +1,7 @@
 # Clinic Atlas Medical Thesaurus
 # Format: abbreviation : expansion(s)
-# Ambiguous abbreviations expand to all meanings (recall over precision)
+# Each key must appear only once — PostgreSQL uses the last definition for duplicates.
+# Ambiguous abbreviations expand to all meanings (recall over precision).
 # Used by PostgreSQL text search configuration 'medical'
 
 # ============================================================================
@@ -12,20 +13,20 @@ ami : acute myocardial infarction
 chf : congestive heart failure
 afib : atrial fibrillation
 dvt : deep vein thrombosis
-pe : pulmonary embolism
+pe : pulmonary embolism physical examination
 cad : coronary artery disease
 svt : supraventricular tachycardia
 vt : ventricular tachycardia
 vf : ventricular fibrillation
 bp : blood pressure
-sbp : systolic blood pressure
+sbp : systolic blood pressure spontaneous bacterial peritonitis
 dbp : diastolic blood pressure
 hr : heart rate
 ecg : electrocardiogram
 ekg : electrocardiogram
 pvc : premature ventricular contraction
 pac : premature atrial contraction
-asd : atrial septal defect
+asd : atrial septal defect autism spectrum disorder
 vsd : ventricular septal defect
 pda : patent ductus arteriosus
 mvp : mitral valve prolapse
@@ -43,7 +44,7 @@ aaa : abdominal aortic aneurysm
 pad : peripheral arterial disease
 pvd : peripheral vascular disease
 av : atrioventricular
-sa : sinoatrial
+sa : sinoatrial suicide attempt
 lbbb : left bundle branch block
 rbbb : right bundle branch block
 lvh : left ventricular hypertrophy
@@ -54,7 +55,7 @@ co : cardiac output
 cvp : central venous pressure
 map : mean arterial pressure
 crt : cardiac resynchronization therapy
-icd : implantable cardioverter defibrillator
+icd : implantable cardioverter defibrillator irritant contact dermatitis
 tee : transesophageal echocardiogram
 tte : transthoracic echocardiogram
 bnp : brain natriuretic peptide
@@ -97,7 +98,7 @@ ild : interstitial lung disease
 ipf : idiopathic pulmonary fibrosis
 pah : pulmonary arterial hypertension
 cf : cystic fibrosis
-bpd : bronchopulmonary dysplasia
+bpd : bronchopulmonary dysplasia borderline personality disorder
 rds : respiratory distress syndrome
 uri : upper respiratory infection
 lri : lower respiratory infection
@@ -122,10 +123,10 @@ edh : epidural hematoma
 tbi : traumatic brain injury
 gcs : glasgow coma scale
 loc : loss consciousness
-sz : seizure
-se : status epilepticus
+sz : seizure schizophrenia
+se : status epilepticus side effects
 alz : alzheimer disease
-pd : parkinson disease
+pd : parkinson disease peritoneal dialysis
 als : amyotrophic lateral sclerosis
 mnd : motor neuron disease
 msa : multiple system atrophy
@@ -138,10 +139,10 @@ cn : cranial nerve
 dtrs : deep tendon reflexes
 nph : normal pressure hydrocephalus
 mri : magnetic resonance imaging
-ct : computed tomography
+ct : computed tomography chest tube
 cta : computed tomography angiography
 mra : magnetic resonance angiography
-gbs : guillain barre syndrome
+gbs : guillain barre syndrome group b streptococcus
 cidp : chronic inflammatory demyelinating polyneuropathy
 
 # ============================================================================
@@ -179,7 +180,6 @@ dbili : direct bilirubin
 hbv : hepatitis b virus
 hcv : hepatitis c virus
 hav : hepatitis virus
-sbp : spontaneous bacterial peritonitis
 tips : transjugular intrahepatic portosystemic shunt
 
 # ============================================================================
@@ -236,9 +236,8 @@ hsv : herpes simplex virus
 vzv : varicella zoster virus
 rsv : respiratory syncytial virus
 hpv : human papillomavirus
-tb : tuberculosis
 mdr tb : multidrug resistant tuberculosis
-ams : antimicrobial stewardship
+ams : antimicrobial stewardship altered mental status
 cbc : complete blood count
 crp : c reactive protein
 esr : erythrocyte sedimentation rate
@@ -256,7 +255,7 @@ plt : platelet
 inr : international normalized ratio
 ptt : partial thromboplastin time
 aptt : activated partial thromboplastin time
-pt : prothrombin time
+pt : prothrombin time physical therapy
 dic : disseminated intravascular coagulation
 ttp : thrombotic thrombocytopenic purpura
 hus : hemolytic uremic syndrome
@@ -328,7 +327,6 @@ shx : social history
 ros : review systems
 cc : chief complaint
 hpi : history present illness
-pe : physical examination
 a&p : assessment plan
 f/u : follow
 d/c : discharge
@@ -339,7 +337,6 @@ nad : acute distress
 wnl : within normal limits
 nkda : known drug allergies
 aox : alert oriented
-gcs : glasgow coma scale
 avpu : alert voice pain unresponsive
 doa : dead arrival
 dnr : resuscitate
@@ -368,15 +365,12 @@ abx : antibiotics
 epi : epinephrine
 lmwh : low molecular weight heparin
 ufw : unfractionated heparin
-asa : acetylsalicylic acid
+asa : acetylsalicylic acid american society anesthesiologists
 apap : acetaminophen
 otc : counter
-prn : needed
 tdd : total daily dose
 mrdd : maximum recommended daily dose
 adr : adverse drug reaction
-se : side effects
-gi : gastrointestinal
 oc : oral contraceptive
 hrt : hormone replacement therapy
 ics : inhaled corticosteroid
@@ -415,7 +409,6 @@ afi : amniotic fluid index
 edd : estimated date delivery
 lmp : last menstrual period
 ga : gestational age
-gbs : group b streptococcus
 rhogam : rho d immune globulin
 pph : postpartum hemorrhage
 ppd : postpartum depression
@@ -434,10 +427,7 @@ colpo : colposcopy
 # Pediatrics
 # ============================================================================
 apgar : apgar score
-nicu : neonatal intensive care unit
-rds : respiratory distress syndrome
 nec : necrotizing enterocolitis
-bpd : bronchopulmonary dysplasia
 rop : retinopathy prematurity
 pvl : periventricular leukomalacia
 ivh : intraventricular hemorrhage
@@ -445,7 +435,6 @@ sga : small gestational age
 lga : large gestational age
 aga : appropriate gestational age
 iugr : intrauterine growth restriction
-asd : autism spectrum disorder
 adhd : attention deficit hyperactivity disorder
 ftt : failure thrive
 sids : sudden infant death syndrome
@@ -464,28 +453,23 @@ gad : generalized anxiety disorder
 ocd : obsessive compulsive disorder
 ptsd : post traumatic stress disorder
 mdd : major depressive disorder
-bpd : borderline personality disorder
 sad : seasonal affective disorder
-si : suicidal ideation
+si : suicidal ideation sacroiliac
 sh : self harm
-sa : suicide attempt
 eds : eating disorder
 # an : anorexia nervosa (stop word conflict)
 bn : bulimia nervosa
 bed : binge eating disorder
 bpad : bipolar affective disorder
-sz : schizophrenia
 cbt : cognitive behavioral therapy
 dbt : dialectical behavior therapy
 emdr : eye movement desensitization reprocessing
 ect : electroconvulsive therapy
-tms : transcranial magnetic stimulation
-ams : altered mental status
+tms : transcranial magnetic stimulation tympanic membranes
 
 # ============================================================================
 # Surgery
 # ============================================================================
-cabg : coronary artery bypass graft
 turp : transurethral resection prostate
 turbt : transurethral resection bladder tumor
 lap : laparoscopic
@@ -505,16 +489,12 @@ lcl : lateral collateral ligament
 rom : range motion
 bka : knee amputation
 aka : knee amputation
-asa : american society anesthesiologists
 npwt : negative pressure wound therapy
 ssi : surgical site infection
-dvt : deep vein thrombosis
 vte : venous thromboembolism
 teds : thromboembolic deterrent stockings
 scd : sequential compression device
-ngt : nasogastric tube
 jp : jackson pratt
-ct : chest tube
 foley : foley catheter
 picc : peripherally inserted central catheter
 cvc : central venous catheter
@@ -522,7 +502,6 @@ cvc : central venous catheter
 # ============================================================================
 # Labs / Diagnostics
 # ============================================================================
-cbc : complete blood count
 bmp : basic metabolic panel
 cmp : comprehensive metabolic panel
 lfts : liver function tests
@@ -530,15 +509,10 @@ rfts : renal function tests
 ua : urinalysis
 ucx : urine culture
 bcx : blood culture
-abg : arterial blood gas
 vbg : venous blood gas
-bnp : brain natriuretic peptide
-crp : c reactive protein
-esr : erythrocyte sedimentation rate
 ana : antinuclear antibody
 anca : antineutrophil cytoplasmic antibody
-rf : rheumatoid factor
-hba1c : hemoglobin a1c
+rf : rheumatoid factor renal failure
 psa : prostate specific antigen
 cea : carcinoembryonic antigen
 afp : alpha fetoprotein
@@ -555,19 +529,15 @@ na : sodium
 k : potassium
 cl : chloride
 co2 : carbon dioxide
-ca : calcium
+ca : calcium cancer cardiac arrest
 mg : magnesium
 phos : phosphorus
-tbili : total bilirubin
 alb : albumin
 tp : total protein
 trig : triglycerides
 hdl : high density lipoprotein
 ldl : low density lipoprotein
 tc : total cholesterol
-tsh : thyroid stimulating hormone
-ft4 : free thyroxine
-ft3 : free triiodothyronine
 ferritin : ferritin
 tibc : total iron binding capacity
 b12 : vitamin b twelve
@@ -581,20 +551,15 @@ procalcitonin : procalcitonin
 # ============================================================================
 # Imaging
 # ============================================================================
-ct : computed tomography
-mri : magnetic resonance imaging
 xr : x ray
 # us : ultrasound (stop word conflict)
 echo : echocardiogram
-cxr : chest x ray
 axr : abdominal x ray
 kub : kidneys ureters bladder
 ive : intravenous pyelogram
 dexa : dual energy x ray absorptiometry
 pet : positron emission tomography
 spect : single photon emission computed tomography
-cta : computed tomography angiography
-mra : magnetic resonance angiography
 mrcp : magnetic resonance cholangiopancreatography
 vcug : voiding cystourethrogram
 bme : bone mineral density
@@ -608,8 +573,6 @@ ir : interventional radiology
 # ============================================================================
 oa : osteoarthritis
 ra : rheumatoid arthritis
-acl : anterior cruciate ligament
-rom : range motion
 msk : musculoskeletal
 cts : carpal tunnel syndrome
 oif : open reduction internal fixation
@@ -618,15 +581,11 @@ crps : complex regional pain syndrome
 jia : juvenile idiopathic arthritis
 sle : systemic lupus erythematosus
 dmard : disease modifying antirheumatic drug
-dexa : dual energy x ray absorptiometry
 bmd : bone mineral density
-fx : fracture
 ddd : degenerative disc disease
 djd : degenerative joint disease
-si : sacroiliac
 tfl : tensor fasciae latae
 itb : iliotibial band
-pt : physical therapy
 ot : occupational therapy
 tens : transcutaneous electrical nerve stimulation
 
@@ -639,13 +598,10 @@ arf : acute renal failure
 crf : chronic renal failure
 esrd : end stage renal disease
 gn : glomerulonephritis
-arf : acute renal failure
 rrt : renal replacement therapy
 hd : hemodialysis
-pd : peritoneal dialysis
 crrt : continuous renal replacement therapy
 bph : benign prostatic hyperplasia
-turp : transurethral resection prostate
 eswl : extracorporeal shock wave lithotripsy
 pcnl : percutaneous nephrolithotomy
 upj : ureteropelvic junction
@@ -661,14 +617,11 @@ rpgn : rapidly progressive glomerulonephritis
 # ============================================================================
 ms : multiple sclerosis mitral stenosis
 # as : aortic stenosis ankylosing spondylitis (stop word conflict)
-ca : cancer calcium cardiac arrest
 ar : aortic regurgitation allergic rhinitis
 cp : chest pain cerebral palsy
 bs : bowel sounds breath sounds blood sugar
 avm : arteriovenous malformation
-pe : pulmonary embolism physical examination
 pna : pneumonia
-rf : rheumatoid factor renal failure
 mr : mitral regurgitation magnetic resonance
 
 # ============================================================================
@@ -716,10 +669,7 @@ adrenaline : epinephrine adrenaline
 scc : squamous cell carcinoma
 bcc : basal cell carcinoma
 acd : allergic contact dermatitis
-icd : irritant contact dermatitis
 ad : atopic dermatitis
-hsv : herpes simplex virus
-vzv : varicella zoster virus
 koh : potassium hydroxide
 bx : biopsy
 uv : ultraviolet
@@ -747,11 +697,9 @@ ioi : intraocular inflammation
 # ENT
 # ============================================================================
 ent : ear nose throat
-tms : tympanic membranes
 som : serous otitis media
 aom : acute otitis media
 ome : otitis media effusion
-osa : obstructive sleep apnea
 pnd : post nasal drip
 snhl : sensorineural hearing loss
 chl : conductive hearing loss

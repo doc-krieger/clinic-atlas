@@ -21,9 +21,7 @@ Every query compounds the knowledge base. Unlike ChatGPT where each session star
 - [ ] Chat interface with streaming LLM responses (SSE)
 - [ ] Source ingestion via PDF upload and URL fetch
 - [ ] PDF parsing (PyMuPDF) and HTML/webpage extraction (trafilatura)
-- [ ] Curated trusted source registry (YAML config)
 - [ ] Web search scoped to trusted source domains for source discovery
-- [ ] Postgres full-text search over knowledge base (tsvector, no vector DB)
 - [ ] Research workflow: local search → evaluate existing knowledge → plan retrieval → fetch → parse → synthesize → approval → save
 - [ ] Source note generation (one per raw source, with provenance)
 - [ ] Topic note generation (synthesis across multiple sources, with inline citations)

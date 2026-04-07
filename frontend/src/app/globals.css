@@ -96,7 +96,7 @@
   --secondary: 240 6% 10%;
   --secondary-foreground: 0 0% 93%;
   --muted: 240 6% 10%;
-  --muted-foreground: 240 5% 46%;  /* hsl(240 5% 46%) - muted text */
+  --muted-foreground: 240 5% 53%;  /* hsl(240 5% 53%) - muted text, ≥4.5:1 on bg+card */
   --accent: 240 6% 10%;
   --accent-foreground: 0 0% 93%;
   --destructive: 0 72% 51%;        /* hsl(0 72% 51%) */

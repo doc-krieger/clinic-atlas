@@ -14,6 +14,7 @@ def test_health_returns_200_with_status(client: TestClient):
 def test_health_has_postgres_check(client: TestClient):
     """GET /api/health includes postgres status ok."""
     response = client.get("/api/health")
+    assert response.status_code == 200
     data = response.json()
     assert data["checks"]["postgres"]["status"] == "ok"
 
@@ -21,6 +22,7 @@ def test_health_has_postgres_check(client: TestClient):
 def test_health_has_all_check_keys(client: TestClient):
     """GET /api/health includes checks for all services."""
     response = client.get("/api/health")
+    assert response.status_code == 200
     data = response.json()
     checks = data["checks"]
     for key in ["postgres", "ollama", "searxng", "disk_notes", "disk_sources"]:
