@@ -1,0 +1,28 @@
+[project]
+name = "clinic-atlas-backend"
+version = "0.1.0"
+description = "Clinic Atlas - Clinical knowledge assistant backend"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.135.3",
+    "sqlmodel>=0.0.38",
+    "alembic>=1.18.0",
+    "pydantic-settings>=2.13.0",
+    "python-frontmatter>=1.1.0",
+    "pyyaml>=6.0.0",
+    "httpx>=0.28.0",
+    "litellm>=1.83.0",
+    "psycopg2-binary>=2.9.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.0",
+    "pytest-asyncio>=0.25.0",
+    "ruff>=0.15.0",
+]

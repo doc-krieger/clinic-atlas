@@ -1,0 +1,709 @@
+# Clinic Atlas Medical Thesaurus
+# Format: abbreviation : expansion(s)
+# Each key must appear only once — PostgreSQL uses the last definition for duplicates.
+# Ambiguous abbreviations expand to all meanings (recall over precision).
+# Used by PostgreSQL text search configuration 'medical'
+
+# ============================================================================
+# Cardiovascular
+# ============================================================================
+htn : hypertension
+mi : myocardial infarction
+ami : acute myocardial infarction
+chf : congestive heart failure
+afib : atrial fibrillation
+dvt : deep vein thrombosis
+pe : pulmonary embolism physical examination
+cad : coronary artery disease
+svt : supraventricular tachycardia
+vt : ventricular tachycardia
+vf : ventricular fibrillation
+bp : blood pressure
+sbp : systolic blood pressure spontaneous bacterial peritonitis
+dbp : diastolic blood pressure
+hr : heart rate
+ecg : electrocardiogram
+ekg : electrocardiogram
+pvc : premature ventricular contraction
+pac : premature atrial contraction
+asd : atrial septal defect autism spectrum disorder
+vsd : ventricular septal defect
+pda : patent ductus arteriosus
+mvp : mitral valve prolapse
+avr : aortic valve replacement
+mvr : mitral valve replacement
+cabg : coronary artery bypass graft
+pci : percutaneous coronary intervention
+ptca : percutaneous transluminal coronary angioplasty
+stemi : st elevation myocardial infarction
+nstemi : non st elevation myocardial infarction
+acs : acute coronary syndrome
+ccf : congestive cardiac failure
+ihd : ischemic heart disease
+aaa : abdominal aortic aneurysm
+pad : peripheral arterial disease
+pvd : peripheral vascular disease
+av : atrioventricular
+sa : sinoatrial suicide attempt
+lbbb : left bundle branch block
+rbbb : right bundle branch block
+lvh : left ventricular hypertrophy
+rvh : right ventricular hypertrophy
+ef : ejection fraction
+lvef : left ventricular ejection fraction
+co : cardiac output
+cvp : central venous pressure
+map : mean arterial pressure
+crt : cardiac resynchronization therapy
+icd : implantable cardioverter defibrillator irritant contact dermatitis
+tee : transesophageal echocardiogram
+tte : transthoracic echocardiogram
+bnp : brain natriuretic peptide
+troponin : troponin
+
+# ============================================================================
+# Respiratory
+# ============================================================================
+copd : chronic obstructive pulmonary disease
+sob : shortness breath
+ards : acute respiratory distress syndrome
+osa : obstructive sleep apnea
+csa : central sleep apnea
+pft : pulmonary function test
+fev1 : forced expiratory volume one second
+fvc : forced vital capacity
+pef : peak expiratory flow
+abg : arterial blood gas
+cxr : chest x ray
+rul : right upper lobe
+rml : right middle lobe
+rll : right lower lobe
+lul : left upper lobe
+lll : left lower lobe
+tb : tuberculosis
+ltbi : latent tuberculosis infection
+cap : community acquired pneumonia
+hap : hospital acquired pneumonia
+vap : ventilator associated pneumonia
+ppe : personal protective equipment
+niv : non invasive ventilation
+cpap : continuous positive airway pressure
+bipap : bilevel positive airway pressure
+peep : positive end expiratory pressure
+fio2 : fraction inspired oxygen
+spo2 : oxygen saturation
+pao2 : partial pressure oxygen
+paco2 : partial pressure carbon dioxide
+ild : interstitial lung disease
+ipf : idiopathic pulmonary fibrosis
+pah : pulmonary arterial hypertension
+cf : cystic fibrosis
+bpd : bronchopulmonary dysplasia borderline personality disorder
+rds : respiratory distress syndrome
+uri : upper respiratory infection
+lri : lower respiratory infection
+ahi : apnea hypopnea index
+ett : endotracheal tube
+
+# ============================================================================
+# Neurology
+# ============================================================================
+cva : cerebrovascular accident
+tia : transient ischemic attack
+lp : lumbar puncture
+eeg : electroencephalogram
+emg : electromyogram
+ncv : nerve conduction velocity
+csf : cerebrospinal fluid
+icp : intracranial pressure
+sah : subarachnoid hemorrhage
+ich : intracerebral hemorrhage
+sdh : subdural hematoma
+edh : epidural hematoma
+tbi : traumatic brain injury
+gcs : glasgow coma scale
+loc : loss consciousness
+sz : seizure schizophrenia
+se : status epilepticus side effects
+alz : alzheimer disease
+pd : parkinson disease peritoneal dialysis
+als : amyotrophic lateral sclerosis
+mnd : motor neuron disease
+msa : multiple system atrophy
+nms : neuroleptic malignant syndrome
+cns : central nervous system
+pns : peripheral nervous system
+ans : autonomic nervous system
+bbb : blood brain barrier
+cn : cranial nerve
+dtrs : deep tendon reflexes
+nph : normal pressure hydrocephalus
+mri : magnetic resonance imaging
+ct : computed tomography chest tube
+cta : computed tomography angiography
+mra : magnetic resonance angiography
+gbs : guillain barre syndrome group b streptococcus
+cidp : chronic inflammatory demyelinating polyneuropathy
+
+# ============================================================================
+# Gastrointestinal
+# ============================================================================
+gerd : gastroesophageal reflux disease
+gi : gastrointestinal
+gib : gastrointestinal bleed
+ugib : upper gastrointestinal bleed
+lgib : lower gastrointestinal bleed
+ibd : inflammatory bowel disease
+ibs : irritable bowel syndrome
+uc : ulcerative colitis
+cd : crohn disease
+sbo : small bowel obstruction
+lbo : large bowel obstruction
+pud : peptic ulcer disease
+ercp : endoscopic retrograde cholangiopancreatography
+eus : endoscopic ultrasound
+egd : esophagogastroduodenoscopy
+ngt : nasogastric tube
+peg : percutaneous endoscopic gastrostomy
+tpn : total parenteral nutrition
+nafld : non alcoholic fatty liver disease
+nash : non alcoholic steatohepatitis
+hcc : hepatocellular carcinoma
+sgot : serum glutamic oxaloacetic transaminase
+sgpt : serum glutamic pyruvic transaminase
+alt : alanine aminotransferase
+ast : aspartate aminotransferase
+alp : alkaline phosphatase
+ggt : gamma glutamyl transferase
+tbili : total bilirubin
+dbili : direct bilirubin
+hbv : hepatitis b virus
+hcv : hepatitis c virus
+hav : hepatitis virus
+tips : transjugular intrahepatic portosystemic shunt
+
+# ============================================================================
+# Endocrinology
+# ============================================================================
+dm : diabetes mellitus
+t1dm : type one diabetes mellitus
+t2dm : type two diabetes mellitus
+dka : diabetic ketoacidosis
+hhs : hyperosmolar hyperglycemic state
+tsh : thyroid stimulating hormone
+t3 : triiodothyronine
+t4 : thyroxine
+ft3 : free triiodothyronine
+ft4 : free thyroxine
+hba1c : hemoglobin a1c
+ogtt : oral glucose tolerance test
+fbg : fasting blood glucose
+pth : parathyroid hormone
+acth : adrenocorticotropic hormone
+gh : growth hormone
+igf : insulin growth factor
+fsh : follicle stimulating hormone
+lh : luteinizing hormone
+dhea : dehydroepiandrosterone
+pcos : polycystic ovary syndrome
+siadh : syndrome inappropriate antidiuretic hormone
+di : diabetes insipidus
+prl : prolactin
+bmr : basal metabolic rate
+mody : maturity onset diabetes young
+sglt2 : sodium glucose cotransporter two
+glp1 : glucagon peptide one
+dpp4 : dipeptidyl peptidase four
+
+# ============================================================================
+# Infectious Disease
+# ============================================================================
+uti : urinary tract infection
+rti : respiratory tract infection
+mrsa : methicillin resistant staphylococcus aureus
+vre : vancomycin resistant enterococcus
+esbl : extended spectrum beta lactamase
+mdr : multidrug resistant
+xdr : extensively drug resistant
+hiv : human immunodeficiency virus
+aids : acquired immune deficiency syndrome
+std : sexually transmitted disease
+sti : sexually transmitted infection
+cdiff : clostridioides difficile
+cmv : cytomegalovirus
+ebv : epstein barr virus
+hsv : herpes simplex virus
+vzv : varicella zoster virus
+rsv : respiratory syncytial virus
+hpv : human papillomavirus
+mdr tb : multidrug resistant tuberculosis
+ams : antimicrobial stewardship altered mental status
+cbc : complete blood count
+crp : c reactive protein
+esr : erythrocyte sedimentation rate
+wbc : white blood cell
+rbc : red blood cell
+pid : pelvic inflammatory disease
+sbe : subacute bacterial endocarditis
+
+# ============================================================================
+# Hematology / Oncology
+# ============================================================================
+hgb : hemoglobin
+hct : hematocrit
+plt : platelet
+inr : international normalized ratio
+ptt : partial thromboplastin time
+aptt : activated partial thromboplastin time
+pt : prothrombin time physical therapy
+dic : disseminated intravascular coagulation
+ttp : thrombotic thrombocytopenic purpura
+hus : hemolytic uremic syndrome
+itp : immune thrombocytopenic purpura
+hit : heparin induced thrombocytopenia
+vwd : von willebrand disease
+g6pd : glucose six phosphate dehydrogenase
+aml : acute myeloid leukemia
+# all : acute lymphoblastic leukemia (stop word conflict)
+cml : chronic myeloid leukemia
+cll : chronic lymphocytic leukemia
+nhl : non hodgkin lymphoma
+hl : hodgkin lymphoma
+mm : multiple myeloma
+mds : myelodysplastic syndrome
+mpn : myeloproliferative neoplasm
+pv : polycythemia vera
+et : essential thrombocythemia
+lad : lymphadenopathy
+hsct : hematopoietic stem cell transplant
+bmt : bone marrow transplant
+gvhd : graft versus host disease
+retic : reticulocyte
+mcv : mean corpuscular volume
+mch : mean corpuscular hemoglobin
+mchc : mean corpuscular hemoglobin concentration
+rdw : red cell distribution width
+ldh : lactate dehydrogenase
+hapto : haptoglobin
+
+# ============================================================================
+# General / Common
+# ============================================================================
+er : emergency room
+ed : emergency department
+icu : intensive care unit
+nicu : neonatal intensive care unit
+picu : pediatric intensive care unit
+ccu : coronary care unit
+# or : operating room (stop word conflict)
+pacu : post anesthesia care unit
+bmi : body mass index
+prn : needed
+bid : twice daily
+tid : three times daily
+qid : four times daily
+qhs : bedtime
+ac : meals
+pc : meals
+po : mouth
+iv : intravenous
+im : intramuscular
+sc : subcutaneous
+sl : sublingual
+pr : per rectum
+npo : nothing mouth
+gtt : drops
+rx : prescription
+dx : diagnosis
+ddx : differential diagnosis
+tx : treatment
+hx : history
+sx : symptoms
+fx : fracture
+px : prognosis
+pmhx : past medical history
+fhx : family history
+shx : social history
+ros : review systems
+cc : chief complaint
+hpi : history present illness
+a&p : assessment plan
+f/u : follow
+d/c : discharge
+aox3 : alert oriented times three
+wn : well nourished
+wd : well developed
+nad : acute distress
+wnl : within normal limits
+nkda : known drug allergies
+aox : alert oriented
+avpu : alert voice pain unresponsive
+doa : dead arrival
+dnr : resuscitate
+cpr : cardiopulmonary resuscitation
+rosc : return spontaneous circulation
+ems : emergency medical services
+lma : laryngeal mask airway
+rsi : rapid sequence intubation
+
+# ============================================================================
+# Pharmacology
+# ============================================================================
+nsaid : nonsteroidal anti inflammatory drug
+ssri : selective serotonin reuptake inhibitor
+snri : serotonin norepinephrine reuptake inhibitor
+tca : tricyclic antidepressant
+maoi : monoamine oxidase inhibitor
+ace : angiotensin converting enzyme
+acei : angiotensin converting enzyme inhibitor
+arb : angiotensin receptor blocker
+ccb : calcium channel blocker
+bb : beta blocker
+ppi : proton pump inhibitor
+h2ra : histamine two receptor antagonist
+abx : antibiotics
+epi : epinephrine
+lmwh : low molecular weight heparin
+ufw : unfractionated heparin
+asa : acetylsalicylic acid american society anesthesiologists
+apap : acetaminophen
+otc : counter
+tdd : total daily dose
+mrdd : maximum recommended daily dose
+adr : adverse drug reaction
+oc : oral contraceptive
+hrt : hormone replacement therapy
+ics : inhaled corticosteroid
+laba : long acting beta agonist
+saba : short acting beta agonist
+lama : long acting muscarinic antagonist
+sama : short acting muscarinic antagonist
+oac : oral anticoagulant
+doac : direct oral anticoagulant
+noac : novel oral anticoagulant
+
+# ============================================================================
+# OB/GYN
+# ============================================================================
+iup : intrauterine pregnancy
+iud : intrauterine device
+iui : intrauterine insemination
+ivf : vitro fertilization
+pprom : preterm premature rupture membranes
+prom : premature rupture membranes
+hellp : hemolysis elevated liver enzymes low platelets
+pih : pregnancy induced hypertension
+gdm : gestational diabetes mellitus
+ectopic : ectopic pregnancy
+sab : spontaneous abortion
+tab : therapeutic abortion
+d&c : dilation curettage
+c/s : cesarean section
+svd : spontaneous vaginal delivery
+nsvd : normal spontaneous vaginal delivery
+bpp : biophysical profile
+nst : non stress test
+cst : contraction stress test
+afv : amniotic fluid volume
+afi : amniotic fluid index
+edd : estimated date delivery
+lmp : last menstrual period
+ga : gestational age
+rhogam : rho d immune globulin
+pph : postpartum hemorrhage
+ppd : postpartum depression
+bfp : big fat positive
+hcg : human chorionic gonadotropin
+bhcg : beta human chorionic gonadotropin
+tpal : term preterm abortion living
+g : gravida
+p : para
+fundal : fundal
+pap : papanicolaou
+leep : loop electrosurgical excision procedure
+colpo : colposcopy
+
+# ============================================================================
+# Pediatrics
+# ============================================================================
+apgar : apgar score
+nec : necrotizing enterocolitis
+rop : retinopathy prematurity
+pvl : periventricular leukomalacia
+ivh : intraventricular hemorrhage
+sga : small gestational age
+lga : large gestational age
+aga : appropriate gestational age
+iugr : intrauterine growth restriction
+adhd : attention deficit hyperactivity disorder
+ftt : failure thrive
+sids : sudden infant death syndrome
+ais : acute ischemic stroke
+dtap : diphtheria tetanus acellular pertussis
+mmr : measles mumps rubella
+ipv : inactivated polio vaccine
+hib : haemophilus influenzae type b
+pcv : pneumococcal conjugate vaccine
+rotv : rotavirus vaccine
+
+# ============================================================================
+# Psychiatry
+# ============================================================================
+gad : generalized anxiety disorder
+ocd : obsessive compulsive disorder
+ptsd : post traumatic stress disorder
+mdd : major depressive disorder
+sad : seasonal affective disorder
+si : suicidal ideation sacroiliac
+sh : self harm
+eds : eating disorder
+# an : anorexia nervosa (stop word conflict)
+bn : bulimia nervosa
+bed : binge eating disorder
+bpad : bipolar affective disorder
+cbt : cognitive behavioral therapy
+dbt : dialectical behavior therapy
+emdr : eye movement desensitization reprocessing
+ect : electroconvulsive therapy
+tms : transcranial magnetic stimulation tympanic membranes
+
+# ============================================================================
+# Surgery
+# ============================================================================
+turp : transurethral resection prostate
+turbt : transurethral resection bladder tumor
+lap : laparoscopic
+lsc : laparoscopic
+appy : appendectomy
+chole : cholecystectomy
+lap chole : laparoscopic cholecystectomy
+orif : open reduction internal fixation
+tkr : total knee replacement
+thr : total hip replacement
+tka : total knee arthroplasty
+tha : total hip arthroplasty
+acl : anterior cruciate ligament
+mcl : medial collateral ligament
+pcl : posterior cruciate ligament
+lcl : lateral collateral ligament
+rom : range motion
+bka : knee amputation
+aka : knee amputation
+npwt : negative pressure wound therapy
+ssi : surgical site infection
+vte : venous thromboembolism
+teds : thromboembolic deterrent stockings
+scd : sequential compression device
+jp : jackson pratt
+foley : foley catheter
+picc : peripherally inserted central catheter
+cvc : central venous catheter
+
+# ============================================================================
+# Labs / Diagnostics
+# ============================================================================
+bmp : basic metabolic panel
+cmp : comprehensive metabolic panel
+lfts : liver function tests
+rfts : renal function tests
+ua : urinalysis
+ucx : urine culture
+bcx : blood culture
+vbg : venous blood gas
+ana : antinuclear antibody
+anca : antineutrophil cytoplasmic antibody
+rf : rheumatoid factor renal failure
+psa : prostate specific antigen
+cea : carcinoembryonic antigen
+afp : alpha fetoprotein
+ca125 : cancer antigen one twenty five
+ca199 : cancer antigen nineteen nine
+trop : troponin
+ck : creatine kinase
+ckmb : creatine kinase mb
+bun : blood urea nitrogen
+cr : creatinine
+gfr : glomerular filtration rate
+egfr : estimated glomerular filtration rate
+na : sodium
+k : potassium
+cl : chloride
+co2 : carbon dioxide
+ca : calcium cancer cardiac arrest
+mg : magnesium
+phos : phosphorus
+alb : albumin
+tp : total protein
+trig : triglycerides
+hdl : high density lipoprotein
+ldl : low density lipoprotein
+tc : total cholesterol
+ferritin : ferritin
+tibc : total iron binding capacity
+b12 : vitamin b twelve
+folate : folate
+vitd : vitamin d
+ammonia : ammonia
+lipase : lipase
+amylase : amylase
+procalcitonin : procalcitonin
+
+# ============================================================================
+# Imaging
+# ============================================================================
+xr : x ray
+# us : ultrasound (stop word conflict)
+echo : echocardiogram
+axr : abdominal x ray
+kub : kidneys ureters bladder
+ive : intravenous pyelogram
+dexa : dual energy x ray absorptiometry
+pet : positron emission tomography
+spect : single photon emission computed tomography
+mrcp : magnetic resonance cholangiopancreatography
+vcug : voiding cystourethrogram
+bme : bone mineral density
+mammo : mammogram
+dxa : dual energy x ray absorptiometry
+fna : fine needle aspiration
+ir : interventional radiology
+
+# ============================================================================
+# Musculoskeletal
+# ============================================================================
+oa : osteoarthritis
+ra : rheumatoid arthritis
+msk : musculoskeletal
+cts : carpal tunnel syndrome
+oif : open reduction internal fixation
+rsd : reflex sympathetic dystrophy
+crps : complex regional pain syndrome
+jia : juvenile idiopathic arthritis
+sle : systemic lupus erythematosus
+dmard : disease modifying antirheumatic drug
+bmd : bone mineral density
+ddd : degenerative disc disease
+djd : degenerative joint disease
+tfl : tensor fasciae latae
+itb : iliotibial band
+ot : occupational therapy
+tens : transcutaneous electrical nerve stimulation
+
+# ============================================================================
+# Nephrology / Urology
+# ============================================================================
+ckd : chronic kidney disease
+aki : acute kidney injury
+arf : acute renal failure
+crf : chronic renal failure
+esrd : end stage renal disease
+gn : glomerulonephritis
+rrt : renal replacement therapy
+hd : hemodialysis
+crrt : continuous renal replacement therapy
+bph : benign prostatic hyperplasia
+eswl : extracorporeal shock wave lithotripsy
+pcnl : percutaneous nephrolithotomy
+upj : ureteropelvic junction
+rta : renal tubular acidosis
+atin : acute tubulointerstitial nephritis
+fsgs : focal segmental glomerulosclerosis
+mpgn : membranoproliferative glomerulonephritis
+pkd : polycystic kidney disease
+rpgn : rapidly progressive glomerulonephritis
+
+# ============================================================================
+# Ambiguous Abbreviations (expand to all meanings per D-12)
+# ============================================================================
+ms : multiple sclerosis mitral stenosis
+# as : aortic stenosis ankylosing spondylitis (stop word conflict)
+ar : aortic regurgitation allergic rhinitis
+cp : chest pain cerebral palsy
+bs : bowel sounds breath sounds blood sugar
+avm : arteriovenous malformation
+pna : pneumonia
+mr : mitral regurgitation magnetic resonance
+
+# ============================================================================
+# Canadian/British Spelling Variants (per D-13)
+# ============================================================================
+anaemia : anemia anaemia
+haemoglobin : hemoglobin haemoglobin
+oedema : edema oedema
+oesophagus : esophagus oesophagus
+paediatric : pediatric paediatric
+gynaecology : gynecology gynaecology
+haemorrhage : hemorrhage haemorrhage
+diarrhoea : diarrhea diarrhoea
+foetus : fetus foetus
+leukaemia : leukemia leukaemia
+orthopaedic : orthopedic orthopaedic
+anaesthesia : anesthesia anaesthesia
+colour : color colour
+tumour : tumor tumour
+behaviour : behavior behaviour
+honour : honor honour
+programme : program programme
+fibre : fiber fibre
+centre : center centre
+litre : liter litre
+metre : meter metre
+defence : defense defence
+offence : offense offence
+catalogue : catalog catalogue
+manoeuvre : maneuver manoeuvre
+grey : gray grey
+ageing : aging ageing
+judgement : judgment judgement
+practise : practice practise
+analyse : analyze analyse
+coeliac : celiac coeliac
+oestrogen : estrogen oestrogen
+haematology : hematology haematology
+paracetamol : acetaminophen paracetamol
+adrenaline : epinephrine adrenaline
+
+# ============================================================================
+# Dermatology
+# ============================================================================
+scc : squamous cell carcinoma
+bcc : basal cell carcinoma
+acd : allergic contact dermatitis
+ad : atopic dermatitis
+koh : potassium hydroxide
+bx : biopsy
+uv : ultraviolet
+uvb : ultraviolet b
+puva : psoralen ultraviolet
+
+# ============================================================================
+# Ophthalmology
+# ============================================================================
+iop : intraocular pressure
+od : right eye
+os : left eye
+ou : eyes
+va : visual acuity
+bv : binocular vision
+amd : age related macular degeneration
+drp : diabetic retinopathy
+npdr : non proliferative diabetic retinopathy
+pdr : proliferative diabetic retinopathy
+rvo : retinal vein occlusion
+rao : retinal artery occlusion
+ioi : intraocular inflammation
+
+# ============================================================================
+# ENT
+# ============================================================================
+ent : ear nose throat
+som : serous otitis media
+aom : acute otitis media
+ome : otitis media effusion
+pnd : post nasal drip
+snhl : sensorineural hearing loss
+chl : conductive hearing loss
+bppv : benign paroxysmal positional vertigo
+tonsillectomy : tonsillectomy
+adenoidectomy : adenoidectomy
+fess : functional endoscopic sinus surgery
