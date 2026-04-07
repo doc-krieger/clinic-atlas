@@ -3,6 +3,7 @@
 .opencode/
 .playwright/
 .playwright-mcp/
+.playwright-cli/
 .temp/
 __pycache__/
 .env
