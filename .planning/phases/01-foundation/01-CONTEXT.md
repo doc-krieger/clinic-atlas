@@ -77,6 +77,12 @@ Docker Compose stack (Postgres 17, FastAPI, Next.js, Ollama, SearXNG), Postgres 
 - **D-45:** JSON API and web UI both enabled. Web UI at localhost:8888 for debugging, JSON API for programmatic access from FastAPI.
 - **D-46:** settings.yml checked into repo and mounted into the SearXNG container. Version-controlled and reproducible.
 
+### Testing Infrastructure
+- **D-47:** pytest with real Postgres for backend tests. No SQLite substitution — tests hit actual FTS, thesaurus, and migrations. Catches issues mocks would miss.
+- **D-48:** Vitest + React Testing Library for frontend component/unit tests. No E2E in Phase 1 — add Playwright later when there's real UI to test.
+- **D-49:** Docker Compose test profile: `docker compose --profile test run backend-test` spins up a test Postgres and runs pytest. Frontend tests run locally via `pnpm test`.
+- **D-50:** Coverage philosophy: test critical paths (API endpoints, business logic, data integrity), not arbitrary coverage %. Tests should catch regressions.
+
 ### Claude's Discretion
 - Loading skeleton design and exact spacing/typography
 - Exact Tailwind color palette within the dark-mode clinical-clean direction

@@ -66,6 +66,16 @@ Every query compounds the knowledge base. Unlike ChatGPT where each session star
 - **Package managers**: uv (backend), pnpm (frontend)
 - **Privacy**: Local-first — clinical data stays on the user's machine by default
 - **Architecture**: Single Python process backend, no workers, no message broker
+- **Testing**: Every phase includes tests for new functionality. Tests must pass before merging. TDD where practical — write tests alongside features, not as an afterthought.
+
+## Testing Strategy
+
+Every phase delivers tests alongside its features. This is a cross-cutting concern, not a separate phase.
+
+- **Backend**: pytest with real Postgres (no SQLite substitution). Tests hit actual FTS, thesaurus, and migrations. Docker Compose test profile for isolated test runs.
+- **Frontend**: Vitest + React Testing Library for component/unit tests. E2E tests (Playwright) added when there's real UI to test.
+- **Coverage philosophy**: Test critical paths — API endpoints, business logic, data integrity. No arbitrary coverage % target. Tests should catch regressions, not pad metrics.
+- **Test infrastructure**: Set up in Phase 1 alongside the dev stack. `docker compose --profile test run backend-test` for backend. `pnpm test` for frontend.
 
 ## Key Decisions
 
