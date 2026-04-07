@@ -12,7 +12,7 @@ class Settings(BaseSettings):
 
     # LLM (D-32)
     ollama_base_url: str = "http://ollama:11434"
-    llama_server_url: str | None = None  # Optional alternative (D-32)
+    llama_server_url: str = ""  # Optional alternative (D-32)
 
     # SearXNG
     searxng_url: str = "http://searxng:8080"

@@ -2,26 +2,30 @@
 
 import tempfile
 
+from app.config import Settings
 from app.sources.registry import SourceRegistry, load_source_registry
+
+_settings = Settings()
+_SOURCES_PATH = _settings.clinic_atlas_sources_file
 
 
 def test_load_source_registry_returns_sources():
     """Loading config/sources.yml returns a SourceRegistry with sources."""
-    registry = load_source_registry("config/sources.yml")
+    registry = load_source_registry(_SOURCES_PATH)
     assert isinstance(registry, SourceRegistry)
     assert len(registry.all_sources) > 0, "Registry should have at least one source"
 
 
 def test_registry_contains_cps():
     """Registry contains CPS (cps.ca) as a trusted source."""
-    registry = load_source_registry("config/sources.yml")
+    registry = load_source_registry(_SOURCES_PATH)
     domains = [s.domain for s in registry.all_sources]
     assert "cps.ca" in domains, "Registry should contain cps.ca"
 
 
 def test_all_sources_have_required_fields():
     """Every source has non-empty name and domain."""
-    registry = load_source_registry("config/sources.yml")
+    registry = load_source_registry(_SOURCES_PATH)
     for source in registry.all_sources:
         assert source.name, f"Source missing name: {source}"
         assert source.domain, f"Source missing domain: {source}"
@@ -29,7 +33,7 @@ def test_all_sources_have_required_fields():
 
 def test_all_sources_have_valid_reliability_tier():
     """Every source has a valid reliability_tier value."""
-    registry = load_source_registry("config/sources.yml")
+    registry = load_source_registry(_SOURCES_PATH)
     valid_tiers = {"authoritative", "reference", "supplementary"}
     for source in registry.all_sources:
         assert source.reliability_tier.value in valid_tiers, (

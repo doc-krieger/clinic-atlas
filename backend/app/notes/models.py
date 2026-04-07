@@ -1,6 +1,6 @@
 import enum
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from sqlmodel import ARRAY, Column, Field, Relationship, SQLModel, String
 
@@ -23,7 +23,7 @@ class NoteStatus(str, enum.Enum):
 class Note(SQLModel, table=True):
     __tablename__ = "notes"
 
-    id: int | None = Field(default=None, primary_key=True)
+    id: Optional[int] = Field(default=None, primary_key=True)
     slug: str = Field(max_length=255, unique=True, index=True)
     title: str
     content: str = Field(default="")
@@ -44,12 +44,12 @@ class NoteSource(SQLModel, table=True):
 
     __tablename__ = "note_sources"
 
-    id: int | None = Field(default=None, primary_key=True)
+    id: Optional[int] = Field(default=None, primary_key=True)
     note_id: int = Field(foreign_key="notes.id", index=True)
     raw_source_id: int = Field(foreign_key="raw_sources.id", index=True)
-    page_number: int | None = None
-    section_heading: str | None = None
-    quote_excerpt: str | None = None
+    page_number: Optional[int] = None
+    section_heading: Optional[str] = None
+    quote_excerpt: Optional[str] = None
 
-    note: Note | None = Relationship(back_populates="note_sources")
-    raw_source: "RawSource | None" = Relationship(back_populates="note_sources")
+    note: Optional["Note"] = Relationship(back_populates="note_sources")
+    raw_source: Optional["RawSource"] = Relationship(back_populates="note_sources")

@@ -1,11 +1,15 @@
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.pool import StaticPool
-from sqlmodel import Session, create_engine
+from sqlmodel import SQLModel, Session, create_engine
 
 from app.config import Settings
 from app.database import get_session
 from app.main import app
+
+# Import all models so metadata is populated
+from app.notes.models import Note, NoteSource  # noqa: F401
+from app.sources.models import RawSource  # noqa: F401
 
 settings = Settings()
 

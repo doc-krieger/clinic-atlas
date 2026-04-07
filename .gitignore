@@ -2,3 +2,6 @@
 .codex/
 .opencode/
 .playwright/
+.playwright-mcp/
+temp/
+__pycache__/
