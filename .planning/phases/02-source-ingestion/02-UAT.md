@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 02-source-ingestion
 source: [02-01-SUMMARY.md, 02-02-SUMMARY.md, 02-03-SUMMARY.md, 02-04-SUMMARY.md]
 started: 2026-04-07T22:00:00Z
@@ -66,7 +66,10 @@ blocked: 0
   reason: "Source list does not refresh after PDF upload completion. Only refreshes after clicking 'Upload another' which resets the form. The refreshKey increment likely happens on form reset, not on SSE complete event."
   severity: minor
   test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "In pdf-upload-tab.tsx onComplete callback, onSourceAdded() is only called in the non-warning branch. When scanned_pdf quality flag is detected, state is set to 'warning' but onSourceAdded() is never called, so refreshKey never increments."
+  artifacts:
+    - path: "frontend/src/components/sources/pdf-upload-tab.tsx"
+      issue: "onSourceAdded() not called when scanned_pdf warning triggers"
+  missing:
+    - "Call onSourceAdded() unconditionally in onComplete callback, before checking quality_flags"
   debug_session: ""
