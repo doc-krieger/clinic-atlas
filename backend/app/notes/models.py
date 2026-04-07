@@ -29,7 +29,7 @@ class Note(SQLModel, table=True):
     content: str = Field(default="")
     type: NoteType
     status: NoteStatus = Field(default=NoteStatus.draft)
-    tags: list[str] = Field(default_factory=list, sa_column=Column(ARRAY(String), default=[]))
+    tags: list[str] = Field(default_factory=list, sa_column=Column(ARRAY(String)))
     version: int = Field(default=1)  # D-09
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(

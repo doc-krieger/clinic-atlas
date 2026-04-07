@@ -27,6 +27,7 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -64,6 +65,7 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -85,39 +87,39 @@
 
 .dark {
   /* UI-SPEC Color Contract - Dark Mode */
-  --background: 240 10% 4%;        /* hsl(240 10% 4%) - dominant surface */
-  --foreground: 0 0% 93%;          /* hsl(0 0% 93%) - primary text */
-  --card: 240 6% 10%;              /* hsl(240 6% 10%) - secondary surface */
-  --card-foreground: 0 0% 93%;
-  --popover: 240 6% 10%;
-  --popover-foreground: 0 0% 93%;
-  --primary: 210 100% 60%;         /* hsl(210 100% 60%) - accent */
-  --primary-foreground: 0 0% 100%;
-  --secondary: 240 6% 10%;
-  --secondary-foreground: 0 0% 93%;
-  --muted: 240 6% 10%;
-  --muted-foreground: 240 5% 53%;  /* hsl(240 5% 53%) - muted text, ≥4.5:1 on bg+card */
-  --accent: 240 6% 10%;
-  --accent-foreground: 0 0% 93%;
-  --destructive: 0 72% 51%;        /* hsl(0 72% 51%) */
-  --destructive-foreground: 0 0% 100%;
-  --border: 240 4% 16%;            /* hsl(240 4% 16%) */
-  --input: 240 4% 16%;
-  --ring: 210 100% 60%;            /* focus ring matches accent */
+  --background: hsl(240 10% 4%);        /* dominant surface */
+  --foreground: hsl(0 0% 93%);          /* primary text */
+  --card: hsl(240 6% 10%);              /* secondary surface */
+  --card-foreground: hsl(0 0% 93%);
+  --popover: hsl(240 6% 10%);
+  --popover-foreground: hsl(0 0% 93%);
+  --primary: hsl(210 100% 60%);         /* accent */
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(240 6% 10%);
+  --secondary-foreground: hsl(0 0% 93%);
+  --muted: hsl(240 6% 10%);
+  --muted-foreground: hsl(240 5% 53%);  /* muted text, ≥4.5:1 on bg+card */
+  --accent: hsl(240 6% 10%);
+  --accent-foreground: hsl(0 0% 93%);
+  --destructive: hsl(0 72% 51%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(240 4% 16%);
+  --input: hsl(240 4% 16%);
+  --ring: hsl(210 100% 60%);            /* focus ring matches accent */
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar-background: 240 6% 10%;
-  --sidebar-foreground: 0 0% 93%;
-  --sidebar: 240 6% 10%;
-  --sidebar-primary: 210 100% 60%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 6% 10%;
-  --sidebar-accent-foreground: 0 0% 93%;
-  --sidebar-border: 240 4% 16%;
-  --sidebar-ring: 210 100% 60%;
+  --sidebar-background: hsl(240 6% 10%);
+  --sidebar-foreground: hsl(0 0% 93%);
+  --sidebar: hsl(240 6% 10%);
+  --sidebar-primary: hsl(210 100% 60%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 6% 10%);
+  --sidebar-accent-foreground: hsl(0 0% 93%);
+  --sidebar-border: hsl(240 4% 16%);
+  --sidebar-ring: hsl(210 100% 60%);
 }
 
 @layer base {

@@ -89,7 +89,7 @@ Dark mode is the default theme (D-41). All hex values below are for dark mode. L
 
 **Accent reserved for:** Primary CTA buttons, active/selected sidebar item indicator, focus rings on interactive elements, link text. Never for decorative purposes or large surface areas.
 
-**Rationale:** Near-black background with subtle blue tint matches Linear/Raycast. High contrast text (93% white) on dark surfaces. Blue accent is clinical and professional — avoids the green/teal medical cliche.
+**Rationale:** Near-black background with subtle blue tint matches Linear/Raycast. High-contrast text (93% white) on dark surfaces. Blue accent is clinical and professional — avoids the green/teal medical cliché.
 
 **Source:** D-41 (dark mode default, clinical-clean, muted accent, high contrast, Linear/Raycast). Exact values are Claude's discretion per CONTEXT.md.
 
@@ -103,7 +103,7 @@ Phase 1 delivers a static layout skeleton. No functional chat — just the visua
 
 **Primary focal point:** Empty state card, centered vertically and horizontally in the main content area. This is the first element the user's eye should land on after page load.
 
-```
+```text
 +------------------+----------------------------------------+
 |                  |                                        |
 |    Sidebar       |         Main Content Area              |

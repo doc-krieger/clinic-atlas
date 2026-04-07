@@ -1,9 +1,9 @@
-.PHONY: up down restart logs build \
+.PHONY: up up-logs down restart logs logs-backend logs-frontend build \
        test test-backend test-frontend \
-       lint lint-backend lint-frontend \
+       lint lint-backend lint-frontend fmt \
        migrate migrate-new \
        shell-backend shell-frontend shell-db \
-       clean
+       clean help
 
 # ── Services ──────────────────────────────────────────────
 
@@ -62,6 +62,7 @@ migrate:               ## Run pending migrations
 	docker compose exec backend uv run alembic upgrade head
 
 migrate-new:           ## Create a new migration (usage: make migrate-new msg="add foo table")
+	@test -n "$(msg)" || (echo "Error: msg is required. Usage: make migrate-new msg=\"add foo table\"" && exit 1)
 	docker compose exec backend uv run alembic revision --autogenerate -m "$(msg)"
 
 # ── Shells ────────────────────────────────────────────────

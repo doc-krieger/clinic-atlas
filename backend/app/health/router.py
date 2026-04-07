@@ -1,4 +1,5 @@
 import asyncio
+import functools
 import logging
 import os
 
@@ -14,6 +15,11 @@ from app.notes.service import reindex_from_disk
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["health"])
 
+
+@functools.lru_cache
+def get_settings() -> Settings:
+    return Settings()
+
 # Short timeout for health probes — combined must stay under container's 5s budget
 HEALTH_PROBE_TIMEOUT = 2.0
 
@@ -23,7 +29,7 @@ REQUIRED_SERVICES = {"postgres", "disk_notes", "disk_sources"}
 
 @router.get("/health")
 async def health(session: Session = Depends(get_session)):
-    settings = Settings()
+    settings = get_settings()
     checks: dict = {}
 
     # Postgres
@@ -98,6 +104,6 @@ def reindex(session: Session = Depends(get_session)):
     NOTE: This only syncs the `notes` table. Raw sources (PDFs, URLs) in
     data/sources/ are managed by the ingestion pipeline, not reindex.
     """
-    settings = Settings()
+    settings = get_settings()
     stats = reindex_from_disk(session, settings.clinic_atlas_notes_dir)
     return {"status": "ok", "stats": stats}

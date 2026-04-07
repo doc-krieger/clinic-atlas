@@ -48,7 +48,15 @@ def load_source_registry(path: str) -> SourceRegistry:
     validated = {}
     for category in ["guidelines", "textbooks", "journals", "formularies"]:
         entries = []
-        for item in raw.get(category, []):
+        raw_category = raw.get(category, [])
+        if not isinstance(raw_category, (list, tuple)):
+            logger.warning(
+                "Skipping category %s: expected a list, got %s",
+                category,
+                type(raw_category).__name__,
+            )
+            continue
+        for item in raw_category:
             if not isinstance(item, dict):
                 logger.warning(
                     "Skipping non-mapping entry in %s: %r", category, item

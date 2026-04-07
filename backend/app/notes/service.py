@@ -72,7 +72,8 @@ def reindex_from_disk(session: Session, notes_dir: str) -> dict:
                 nested.commit()
                 stats["upserted"] += 1
             except Exception as e:
-                nested.rollback()
+                if "nested" in locals():
+                    nested.rollback()
                 stats["errors"].append({"file": file_path, "error": str(e)})
                 logger.warning("Reindex error for %s: %s", file_path, e)
     session.commit()

@@ -97,6 +97,26 @@ def test_gin_indexes_exist(session: Session):
         "idx_raw_sources_search is not a GIN index"
 
 
+def test_research_sessions_table_has_expected_columns(session: Session):
+    """Research sessions table exists with all required columns."""
+    result = session.exec(
+        text("""
+            SELECT column_name FROM information_schema.columns
+            WHERE table_name = 'research_sessions'
+            ORDER BY column_name
+        """)
+    )
+    columns = {row[0] for row in result}
+    expected = {
+        "id",
+        "query",
+        "messages",
+        "created_at",
+        "updated_at",
+    }
+    assert expected.issubset(columns), f"Missing columns: {expected - columns}"
+
+
 def test_insert_note_via_sqlmodel(session: Session):
     """Insert a Note record via SQLModel succeeds."""
     note = Note(
