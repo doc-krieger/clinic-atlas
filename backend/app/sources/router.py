@@ -13,8 +13,13 @@ def get_settings() -> Settings:
     return Settings()
 
 
+@lru_cache
+def _load_registry(sources_file: str) -> SourceRegistry:
+    return load_source_registry(sources_file)
+
+
 def get_registry(settings: Settings = Depends(get_settings)) -> SourceRegistry:
-    return load_source_registry(settings.clinic_atlas_sources_file)
+    return _load_registry(settings.clinic_atlas_sources_file)
 
 
 @router.get("/registry")
