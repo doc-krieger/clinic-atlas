@@ -64,12 +64,12 @@ troponin : troponin
 # Respiratory
 # ============================================================================
 copd : chronic obstructive pulmonary disease
-sob : shortness of breath
+sob : shortness breath
 ards : acute respiratory distress syndrome
 osa : obstructive sleep apnea
 csa : central sleep apnea
 pft : pulmonary function test
-fev1 : forced expiratory volume in one second
+fev1 : forced expiratory volume one second
 fvc : forced vital capacity
 pef : peak expiratory flow
 abg : arterial blood gas
@@ -89,10 +89,10 @@ niv : non invasive ventilation
 cpap : continuous positive airway pressure
 bipap : bilevel positive airway pressure
 peep : positive end expiratory pressure
-fio2 : fraction of inspired oxygen
+fio2 : fraction inspired oxygen
 spo2 : oxygen saturation
-pao2 : partial pressure of oxygen
-paco2 : partial pressure of carbon dioxide
+pao2 : partial pressure oxygen
+paco2 : partial pressure carbon dioxide
 ild : interstitial lung disease
 ipf : idiopathic pulmonary fibrosis
 pah : pulmonary arterial hypertension
@@ -121,7 +121,7 @@ sdh : subdural hematoma
 edh : epidural hematoma
 tbi : traumatic brain injury
 gcs : glasgow coma scale
-loc : loss of consciousness
+loc : loss consciousness
 sz : seizure
 se : status epilepticus
 alz : alzheimer disease
@@ -178,7 +178,7 @@ tbili : total bilirubin
 dbili : direct bilirubin
 hbv : hepatitis b virus
 hcv : hepatitis c virus
-hav : hepatitis a virus
+hav : hepatitis virus
 sbp : spontaneous bacterial peritonitis
 tips : transjugular intrahepatic portosystemic shunt
 
@@ -201,18 +201,18 @@ fbg : fasting blood glucose
 pth : parathyroid hormone
 acth : adrenocorticotropic hormone
 gh : growth hormone
-igf : insulin like growth factor
+igf : insulin growth factor
 fsh : follicle stimulating hormone
 lh : luteinizing hormone
 dhea : dehydroepiandrosterone
 pcos : polycystic ovary syndrome
-siadh : syndrome of inappropriate antidiuretic hormone
+siadh : syndrome inappropriate antidiuretic hormone
 di : diabetes insipidus
 prl : prolactin
 bmr : basal metabolic rate
-mody : maturity onset diabetes of the young
+mody : maturity onset diabetes young
 sglt2 : sodium glucose cotransporter two
-glp1 : glucagon like peptide one
+glp1 : glucagon peptide one
 dpp4 : dipeptidyl peptidase four
 
 # ============================================================================
@@ -265,7 +265,7 @@ hit : heparin induced thrombocytopenia
 vwd : von willebrand disease
 g6pd : glucose six phosphate dehydrogenase
 aml : acute myeloid leukemia
-all : acute lymphoblastic leukemia
+# all : acute lymphoblastic leukemia (stop word conflict)
 cml : chronic myeloid leukemia
 cll : chronic lymphocytic leukemia
 nhl : non hodgkin lymphoma
@@ -296,23 +296,23 @@ icu : intensive care unit
 nicu : neonatal intensive care unit
 picu : pediatric intensive care unit
 ccu : coronary care unit
-or : operating room
+# or : operating room (stop word conflict)
 pacu : post anesthesia care unit
 bmi : body mass index
-prn : as needed
+prn : needed
 bid : twice daily
 tid : three times daily
 qid : four times daily
-qhs : at bedtime
-ac : before meals
-pc : after meals
-po : by mouth
+qhs : bedtime
+ac : meals
+pc : meals
+po : mouth
 iv : intravenous
 im : intramuscular
 sc : subcutaneous
 sl : sublingual
 pr : per rectum
-npo : nothing by mouth
+npo : nothing mouth
 gtt : drops
 rx : prescription
 dx : diagnosis
@@ -325,26 +325,26 @@ px : prognosis
 pmhx : past medical history
 fhx : family history
 shx : social history
-ros : review of systems
+ros : review systems
 cc : chief complaint
-hpi : history of present illness
+hpi : history present illness
 pe : physical examination
-a&p : assessment and plan
-f/u : follow up
+a&p : assessment plan
+f/u : follow
 d/c : discharge
-aox3 : alert and oriented times three
+aox3 : alert oriented times three
 wn : well nourished
 wd : well developed
-nad : no acute distress
+nad : acute distress
 wnl : within normal limits
-nkda : no known drug allergies
-aox : alert and oriented
+nkda : known drug allergies
+aox : alert oriented
 gcs : glasgow coma scale
 avpu : alert voice pain unresponsive
-doa : dead on arrival
-dnr : do not resuscitate
+doa : dead arrival
+dnr : resuscitate
 cpr : cardiopulmonary resuscitation
-rosc : return of spontaneous circulation
+rosc : return spontaneous circulation
 ems : emergency medical services
 lma : laryngeal mask airway
 rsi : rapid sequence intubation
@@ -370,8 +370,8 @@ lmwh : low molecular weight heparin
 ufw : unfractionated heparin
 asa : acetylsalicylic acid
 apap : acetaminophen
-otc : over the counter
-prn : as needed
+otc : counter
+prn : needed
 tdd : total daily dose
 mrdd : maximum recommended daily dose
 adr : adverse drug reaction
@@ -394,16 +394,16 @@ noac : novel oral anticoagulant
 iup : intrauterine pregnancy
 iud : intrauterine device
 iui : intrauterine insemination
-ivf : in vitro fertilization
-pprom : preterm premature rupture of membranes
-prom : premature rupture of membranes
+ivf : vitro fertilization
+pprom : preterm premature rupture membranes
+prom : premature rupture membranes
 hellp : hemolysis elevated liver enzymes low platelets
 pih : pregnancy induced hypertension
 gdm : gestational diabetes mellitus
 ectopic : ectopic pregnancy
 sab : spontaneous abortion
 tab : therapeutic abortion
-d&c : dilation and curettage
+d&c : dilation curettage
 c/s : cesarean section
 svd : spontaneous vaginal delivery
 nsvd : normal spontaneous vaginal delivery
@@ -412,7 +412,7 @@ nst : non stress test
 cst : contraction stress test
 afv : amniotic fluid volume
 afi : amniotic fluid index
-edd : estimated date of delivery
+edd : estimated date delivery
 lmp : last menstrual period
 ga : gestational age
 gbs : group b streptococcus
@@ -438,16 +438,16 @@ nicu : neonatal intensive care unit
 rds : respiratory distress syndrome
 nec : necrotizing enterocolitis
 bpd : bronchopulmonary dysplasia
-rop : retinopathy of prematurity
+rop : retinopathy prematurity
 pvl : periventricular leukomalacia
 ivh : intraventricular hemorrhage
-sga : small for gestational age
-lga : large for gestational age
-aga : appropriate for gestational age
+sga : small gestational age
+lga : large gestational age
+aga : appropriate gestational age
 iugr : intrauterine growth restriction
 asd : autism spectrum disorder
 adhd : attention deficit hyperactivity disorder
-ftt : failure to thrive
+ftt : failure thrive
 sids : sudden infant death syndrome
 ais : acute ischemic stroke
 dtap : diphtheria tetanus acellular pertussis
@@ -470,14 +470,14 @@ si : suicidal ideation
 sh : self harm
 sa : suicide attempt
 eds : eating disorder
-an : anorexia nervosa
+# an : anorexia nervosa (stop word conflict)
 bn : bulimia nervosa
 bed : binge eating disorder
 bpad : bipolar affective disorder
 sz : schizophrenia
 cbt : cognitive behavioral therapy
 dbt : dialectical behavior therapy
-emdr : eye movement desensitization and reprocessing
+emdr : eye movement desensitization reprocessing
 ect : electroconvulsive therapy
 tms : transcranial magnetic stimulation
 ams : altered mental status
@@ -486,8 +486,8 @@ ams : altered mental status
 # Surgery
 # ============================================================================
 cabg : coronary artery bypass graft
-turp : transurethral resection of prostate
-turbt : transurethral resection of bladder tumor
+turp : transurethral resection prostate
+turbt : transurethral resection bladder tumor
 lap : laparoscopic
 lsc : laparoscopic
 appy : appendectomy
@@ -502,10 +502,10 @@ acl : anterior cruciate ligament
 mcl : medial collateral ligament
 pcl : posterior cruciate ligament
 lcl : lateral collateral ligament
-rom : range of motion
-bka : below knee amputation
-aka : above knee amputation
-asa : american society of anesthesiologists
+rom : range motion
+bka : knee amputation
+aka : knee amputation
+asa : american society anesthesiologists
 npwt : negative pressure wound therapy
 ssi : surgical site infection
 dvt : deep vein thrombosis
@@ -584,7 +584,7 @@ procalcitonin : procalcitonin
 ct : computed tomography
 mri : magnetic resonance imaging
 xr : x ray
-us : ultrasound
+# us : ultrasound (stop word conflict)
 echo : echocardiogram
 cxr : chest x ray
 axr : abdominal x ray
@@ -609,7 +609,7 @@ ir : interventional radiology
 oa : osteoarthritis
 ra : rheumatoid arthritis
 acl : anterior cruciate ligament
-rom : range of motion
+rom : range motion
 msk : musculoskeletal
 cts : carpal tunnel syndrome
 oif : open reduction internal fixation
@@ -645,7 +645,7 @@ hd : hemodialysis
 pd : peritoneal dialysis
 crrt : continuous renal replacement therapy
 bph : benign prostatic hyperplasia
-turp : transurethral resection of prostate
+turp : transurethral resection prostate
 eswl : extracorporeal shock wave lithotripsy
 pcnl : percutaneous nephrolithotomy
 upj : ureteropelvic junction
@@ -660,7 +660,7 @@ rpgn : rapidly progressive glomerulonephritis
 # Ambiguous Abbreviations (expand to all meanings per D-12)
 # ============================================================================
 ms : multiple sclerosis mitral stenosis
-as : aortic stenosis ankylosing spondylitis
+# as : aortic stenosis ankylosing spondylitis (stop word conflict)
 ca : cancer calcium cardiac arrest
 ar : aortic regurgitation allergic rhinitis
 cp : chest pain cerebral palsy
@@ -724,7 +724,7 @@ koh : potassium hydroxide
 bx : biopsy
 uv : ultraviolet
 uvb : ultraviolet b
-puva : psoralen ultraviolet a
+puva : psoralen ultraviolet
 
 # ============================================================================
 # Ophthalmology
@@ -732,7 +732,7 @@ puva : psoralen ultraviolet a
 iop : intraocular pressure
 od : right eye
 os : left eye
-ou : both eyes
+ou : eyes
 va : visual acuity
 bv : binocular vision
 amd : age related macular degeneration
@@ -746,11 +746,11 @@ ioi : intraocular inflammation
 # ============================================================================
 # ENT
 # ============================================================================
-ent : ear nose and throat
+ent : ear nose throat
 tms : tympanic membranes
 som : serous otitis media
 aom : acute otitis media
-ome : otitis media with effusion
+ome : otitis media effusion
 osa : obstructive sleep apnea
 pnd : post nasal drip
 snhl : sensorineural hearing loss

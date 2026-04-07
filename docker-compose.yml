@@ -22,6 +22,7 @@ services:
       context: ./backend
     volumes:
       - ./backend:/app
+      - /app/.venv
       - ./data/notes:/data/notes
       - ./data/sources:/data/sources
       - ./config:/config:ro
