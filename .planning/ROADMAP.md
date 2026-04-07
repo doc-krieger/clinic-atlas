@@ -32,7 +32,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A search for "HTN" returns results containing "hypertension" (medical synonym dictionary active)
   4. The trusted source registry loads from YAML at startup with no errors
   5. Disk layout directories exist and the reindex endpoint responds 200
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Docker Compose stack + Postgres schema with FTS and medical thesaurus + Alembic migrations
+- [ ] 01-02-PLAN.md — Source registry, search/health/reindex endpoints, and backend test suite
+- [ ] 01-03-PLAN.md — Next.js 15 frontend skeleton with shadcn/ui and chat layout
 
 ### Phase 2: Source Ingestion
 **Goal**: The physician can add clinical source material to the knowledge base via PDF upload or URL, with quality guaranteed before indexing
@@ -109,7 +114,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/? | Not started | - |
+| 1. Foundation | 0/3 | Planning complete | - |
 | 2. Source Ingestion | 0/? | Not started | - |
 | 3. LLM Service and Chat | 0/? | Not started | - |
 | 4. Research Orchestrator | 0/? | Not started | - |
