@@ -46,9 +46,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 4 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Backend infrastructure: dependencies, Docker, migration, schemas, test scaffolds
-- [ ] 02-02-PLAN.md — Backend ingestion service, SearXNG client, API endpoints, tests
-- [ ] 02-03-PLAN.md — Frontend sources page with tabs, SSE progress, quality warnings
+- [x] 02-01-PLAN.md — Backend infrastructure: dependencies, Docker, migration, schemas, test scaffolds
+- [x] 02-02-PLAN.md — Backend ingestion service, SearXNG client, API endpoints, tests
+- [x] 02-03-PLAN.md — Frontend sources page with tabs, SSE progress, quality warnings
 - [ ] 02-04-PLAN.md — Integration verification and user acceptance checkpoint
 
 ### Phase 3: LLM Service and Chat
