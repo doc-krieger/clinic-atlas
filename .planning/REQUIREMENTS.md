@@ -99,39 +99,39 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CHAT-01 | — | Pending |
-| CHAT-02 | — | Pending |
-| CHAT-03 | — | Pending |
-| CHAT-04 | — | Pending |
-| SRCI-01 | — | Pending |
-| SRCI-02 | — | Pending |
-| SRCI-03 | — | Pending |
-| SRCI-04 | — | Pending |
-| SRCI-05 | — | Pending |
-| KBSE-01 | — | Pending |
-| KBSE-02 | — | Pending |
-| KBSE-03 | — | Pending |
-| KBSE-04 | — | Pending |
-| RSRW-01 | — | Pending |
-| RSRW-02 | — | Pending |
-| RSRW-03 | — | Pending |
-| NOTE-01 | — | Pending |
-| NOTE-02 | — | Pending |
-| NOTE-03 | — | Pending |
-| APPR-01 | — | Pending |
-| APPR-02 | — | Pending |
-| APPR-03 | — | Pending |
-| NAVI-01 | — | Pending |
-| NAVI-02 | — | Pending |
-| NAVI-03 | — | Pending |
-| REFR-01 | — | Pending |
-| REFR-02 | — | Pending |
+| KBSE-01 | Phase 1 | Pending |
+| KBSE-02 | Phase 1 | Pending |
+| SRCI-04 | Phase 1 | Pending |
+| SRCI-01 | Phase 2 | Pending |
+| SRCI-02 | Phase 2 | Pending |
+| SRCI-03 | Phase 2 | Pending |
+| SRCI-05 | Phase 2 | Pending |
+| CHAT-01 | Phase 3 | Pending |
+| CHAT-02 | Phase 3 | Pending |
+| CHAT-04 | Phase 3 | Pending |
+| RSRW-01 | Phase 4 | Pending |
+| RSRW-02 | Phase 4 | Pending |
+| RSRW-03 | Phase 4 | Pending |
+| NOTE-01 | Phase 4 | Pending |
+| NOTE-02 | Phase 4 | Pending |
+| NOTE-03 | Phase 4 | Pending |
+| CHAT-03 | Phase 4 | Pending |
+| APPR-01 | Phase 5 | Pending |
+| APPR-02 | Phase 5 | Pending |
+| KBSE-03 | Phase 5 | Pending |
+| KBSE-04 | Phase 5 | Pending |
+| NAVI-01 | Phase 6 | Pending |
+| NAVI-02 | Phase 6 | Pending |
+| NAVI-03 | Phase 6 | Pending |
+| REFR-01 | Phase 7 | Pending |
+| REFR-02 | Phase 7 | Pending |
+| APPR-03 | Phase 7 | Pending |
 
 **Coverage:**
 - v1 requirements: 27 total
-- Mapped to phases: 0
-- Unmapped: 27 ⚠️
+- Mapped to phases: 27
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-06*
-*Last updated: 2026-04-06 after initial definition*
+*Last updated: 2026-04-06 after roadmap creation*
