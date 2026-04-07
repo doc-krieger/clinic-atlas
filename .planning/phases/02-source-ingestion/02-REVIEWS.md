@@ -3,136 +3,139 @@ phase: 2
 reviewers: [codex]
 reviewed_at: 2026-04-07T00:00:00Z
 plans_reviewed: [02-01-PLAN.md, 02-02-PLAN.md, 02-03-PLAN.md, 02-04-PLAN.md]
+review_round: 2
 ---
 
-# Cross-AI Plan Review — Phase 2
+# Cross-AI Plan Review — Phase 2 (Round 2)
+
+> Post-execution review of implemented plans. Round 1 review drove improvements to SSRF handling, quality_flags persistence, content_hash UNIQUE constraint, GET /api/sources endpoint, xfail→real tests, and serial batch ingestion. This round validates the executed plans.
 
 ## Codex Review
 
-**Overall Assessment**
-The plans are directionally solid and likely achieve Phase 2, but several contracts need tightening before execution. The biggest risks are arbitrary URL fetching with Playwright fallback, persistence of ingestion quality flags, SSE lifecycle/error handling, and ensuring skipped scaffold tests do not create false confidence.
+### Overall Summary
+The plans are directionally strong and map well to Phase 2's success criteria. The main risks are concentrated in Plan 02: dependency weight, SSE implementation details, SSRF hardening with Playwright, and long-running synchronous ingestion semantics. I would approve the approach with targeted refinements before execution.
 
 ### Plan 01: Backend Infrastructure
-**Summary**
-Good foundation for dependencies, schema, config, and test fixtures, but it should explicitly add the persistent fields and constraints required by later plans.
+**Summary:** Good foundation plan. It sequences schema, dependencies, Docker, and test scaffolds before service work, which reduces downstream churn.
 
 **Strengths**
-- Captures heavy dependency concerns early: docling, Playwright, CPU-only PyTorch, model cache volume.
-- Adds schema/config scaffolding before backend and frontend implementation.
-- Introduces fixtures and requirement-linked test placeholders.
+- Captures required metadata fields and persists `quality_flags`, which supports visible warnings and later auditability.
+- Adds DB-level `UNIQUE` on `content_hash`, correctly backing duplicate detection with a durable constraint.
+- Uses xfail scaffolds to define expected behavior before service implementation.
 
 **Concerns**
-- `HIGH`: Migration does not mention persistent `quality_flags`/`ingestion_status` fields for scanned or thin-content warnings, so warnings may become transient SSE-only state.
-- `HIGH`: Duplicate detection needs a DB-level unique constraint on `content_hash`; service-only checks are race-prone.
-- `MEDIUM`: `pytest.skip` scaffolds can make the phase look green unless Plan 04 explicitly fails on remaining skips.
-- `MEDIUM`: Heavy dependency installation needs pinned versions and lockfile validation to avoid CUDA wheels or browser install drift.
+- `MEDIUM`: Docling plus PyTorch can create build-time and runtime instability; the plan should pin versions and verify image size/startup time early.
+- `MEDIUM`: `UNIQUE(content_hash)` needs explicit handling for empty extraction, null hashes, and duplicate error translation into user-facing API responses.
+- `LOW`: xfail scaffolds are useful, but they can mask drift unless Plan 04 enforces their removal.
 
 **Suggestions**
-- Add or confirm fields for `content_hash`, `quality_flags`, `ingestion_status`, `parse_error`, `source_type`, `page_count`, `author`, and storage path/source URL as applicable.
-- Use `xfail` or TODO markers that Plan 04 checks, rather than permanent skips.
-- Specify migration nullability/backfill behavior for existing `RawSource` rows.
+- Add indexes for common source-list filters such as `source_type`, creation date, and possibly status/quality flags if queryable.
+- Define JSON column defaults and migration downgrade behavior explicitly.
+- Add a dependency smoke test in Docker that imports docling and verifies the model cache path.
 
-**Risk Assessment**
-`MEDIUM`: The direction is sound, but missing persistence/constraint details could undermine later plans.
+**Risk Assessment:** `MEDIUM` due to heavyweight dependencies and schema semantics, but the plan is otherwise well-contained.
 
 ### Plan 02: Backend Service Layer
-**Summary**
-This is the core of the phase and covers the required workflows, but it carries the highest implementation and security risk.
+**Summary:** This is the highest-value and highest-risk plan. It addresses the phase goals directly and has strong security intent, but the operational and edge-case details need tightening.
 
 **Strengths**
-- Separates ingestion service, SearXNG client, and router responsibilities.
-- Correctly treats docling conversion as CPU-bound and plans thread offloading.
-- Includes deduplication, metadata extraction, scanned/thin-content checks, and mocked tests.
+- Uses `asyncio.to_thread()` for Docling parsing, avoiding event loop blockage.
+- Treats SSRF seriously: scheme allowlist, DNS checks, redirect checks, size limits, and Playwright subresource blocking are the right categories.
+- Persists quality flags rather than making them transient progress-only state.
+- Domain scoping with both `site:` filters and post-filtering is the correct defense against search provider looseness.
 
 **Concerns**
-- `HIGH`: SSRF mitigation is under-specified for redirects, DNS rebinding, non-HTTP schemes, ports, proxy env vars, and Playwright subresource requests.
-- `HIGH`: Synchronous SSE processing needs concurrency limits, cancellation handling, timeouts, and cleanup on client disconnect.
-- `MEDIUM`: `IngestSelectedRequest` and frontend batch ingest do not clearly map to D-14's three endpoints unless selected results call `/fetch` one-by-one.
-- `MEDIUM`: Malformed/encrypted PDFs, zero-page outputs, docling failures, and partial URL fetches need explicit error events and persisted failure states.
-- `MEDIUM`: File write and DB insert order must be atomic enough to avoid orphan files and duplicate races.
+- `HIGH`: Verify the SSE implementation choice. `fastapi.sse.EventSourceResponse` is a suspicious import path; the plan should either use `StreamingResponse` directly or explicitly add/verify a supported SSE dependency.
+- `HIGH`: Playwright SSRF protection is hard. DNS validation before fetch is not enough if redirects, browser subrequests, DNS rebinding, or browser-level navigation bypasses are not handled.
+- `MEDIUM`: Long synchronous processing over SSE needs clear timeout, cancellation, cleanup, and client disconnect behavior.
+- `MEDIUM`: URL extraction needs separate handling for thin content, paywalls, binary URLs, wrong content types, compressed response size, and parser failures.
+- `MEDIUM`: Search-result ingestion needs partial failure semantics, duplicate handling, and deterministic result filtering.
 
 **Suggestions**
-- Add a dedicated URL safety layer: scheme allowlist, DNS/IP validation per redirect, redirect cap, max response size, content-type checks, timeout, and proxy disabling.
-- For Playwright, block navigation/subrequests outside the validated host or trusted allowlist.
-- Define SSE event names and payloads up front: `progress`, `warning`, `duplicate`, `complete`, `error`.
-- Add a bounded semaphore around docling/Playwright work to avoid CPU and memory exhaustion.
+- Define a stable SSE event contract: `progress`, `warning`, `error`, `complete`, with full `RawSource` only on completion.
+- Add explicit tests for encrypted PDFs, malformed PDFs, image-only PDFs, very large PDFs, empty extracted markdown, duplicate content, redirect-to-private-IP, DNS rebinding-style host changes, and oversized compressed responses.
+- Enforce Playwright request interception for all non-document subresources and revalidate every navigation URL.
+- Translate DB uniqueness errors into a clear duplicate response rather than a generic 500.
 
-**Risk Assessment**
-`HIGH`: The plan can achieve the phase goals, but arbitrary URL fetching plus Playwright makes security and resource control non-optional.
+**Risk Assessment:** `HIGH` because this plan carries the security boundary and the core ingestion behavior.
 
-### Plan 03: Frontend Sources Page
-**Summary**
-The UI plan matches the intended user workflows, but it depends on backend contracts that are not yet precise enough.
+### Plan 03: Frontend
+**Summary:** The frontend plan supports the user-facing success criteria well, especially visible quality warnings and source listing. Its main risk is custom SSE parsing and state management for long-running operations.
 
 **Strengths**
-- Aligns the UI with the three user actions: upload, fetch URL, and search sources.
-- Correctly accounts for POST-based SSE using `fetch` plus `ReadableStream`.
-- Includes visible quality warnings for scanned PDFs and thin URL content.
+- Three-tab structure maps cleanly to the three ingestion paths.
+- Manual `fetch` plus `ReadableStream` is appropriate for POST upload/fetch flows where native `EventSource` is insufficient.
+- AbortSignal cancellation and serial batch ingestion reduce backend load.
+- Quality warnings for scanned PDFs and thin content directly satisfy key user-facing requirements.
 
 **Concerns**
-- `HIGH`: `SourceList` requires an API to list indexed raw sources; if Phase 1 already has it, the plan should reference it explicitly.
-- `MEDIUM`: The SSE utility must handle partial frames, stream errors, final error events, cancellation, and UTF-8 chunk boundaries.
-- `MEDIUM`: Batch ingest from selected search results needs a defined serial/parallel policy and a clear mapping to backend endpoints.
-- `LOW`: shadcn component installation and nav polish are reasonable, but should not block the core ingestion workflow.
+- `HIGH`: A custom SSE parser must correctly handle chunk boundaries, multi-line `data:`, event names, error payloads, and stream termination.
+- `MEDIUM`: Serial search ingestion may feel slow; partial success/failure UX must be explicit.
+- `MEDIUM`: Upload UX needs validation for file type, 50 MB limit, aborts, duplicate responses, and backend parse failures.
+- `LOW`: Drag-and-drop needs keyboard-accessible fallback and clear status messaging.
 
 **Suggestions**
-- Create or share typed event contracts for progress, complete, warning, duplicate, and error payloads.
-- Display durable states for duplicate source, scanned PDF, thin URL, JS fallback used, parse failure, cancel, and retry.
-- Limit concurrent selected-result ingests to avoid opening too many SSE streams.
+- Add unit tests for the SSE stream utility with fragmented chunks and multi-event payloads.
+- Refresh the source list after successful ingestion and preserve warnings in the list view.
+- Show per-result status for search ingestion: pending, ingesting, success, duplicate, failed.
+- Disable repeated submissions while an operation is active and expose cancel behavior consistently.
 
-**Risk Assessment**
-`MEDIUM`: Mostly execution risk from unclear contracts and batch-ingest behavior.
+**Risk Assessment:** `MEDIUM` because UI scope is reasonable, but custom streaming UX has enough edge cases to warrant tests.
 
 ### Plan 04: Integration Verification
-**Summary**
-The verification gate is necessary, but it should be more explicit and failure-oriented to prevent superficial completion.
+**Summary:** Strong verification plan, especially because it ties back to acceptance criteria and removes xfail/skips. It should be refined so the gate is strict on phase-critical tests without blocking on unrelated or environment-conditional skips.
 
 **Strengths**
-- Includes full test/lint runs, API curl checks, manual E2E, and a user acceptance checkpoint.
-- Correctly waits until backend and frontend implementation are complete.
-- Maps to the four main ingestion pathways.
+- Verifies all success criteria end-to-end.
+- Includes negative API cases, especially SSRF, which is essential for this phase.
+- Checks database schema, not just API behavior.
+- User acceptance testing is appropriate because visible warning behavior matters.
 
 **Concerns**
-- `HIGH`: It must fail if scaffolded skipped tests remain; otherwise requirements can appear covered without real tests.
-- `MEDIUM`: Needs Docker Compose verification for Postgres migrations, SearXNG, Playwright browser dependencies, and docling cache cold/warm behavior.
-- `MEDIUM`: Manual E2E should include negative cases: scanned PDF, duplicate upload, thin/paywalled URL, SSRF denial, and parse failure.
-- `LOW`: Curl SSE checks should verify streaming events and final `complete`/`error`, not just HTTP 200.
+- `MEDIUM`: "Zero skips" can be too rigid if some tests are environment-conditional, such as Playwright or SearXNG availability.
+- `MEDIUM`: SearXNG verification may be flaky unless backed by a controlled test service or fixture.
+- `LOW`: Integration tests should validate the persisted `quality_flags`, not only streamed warnings.
 
 **Suggestions**
-- Add an acceptance checklist mapped directly to SRCI-01, SRCI-02, SRCI-03, and SRCI-05.
-- Run migrations on both a clean DB and an existing Phase 1 DB.
-- Capture exact UAT fixtures: text PDF, scanned/image PDF, known trusted-domain query, and controlled URL fallback case.
+- Replace "zero skips" with "zero unexpected skips/xfails"; allow explicitly marked environment-gated tests only if documented.
+- Use local fixtures or mocks for SearXNG and URL targets, plus one optional smoke test against the real service.
+- Add an end-to-end happy path for PDF upload, URL fetch, duplicate rejection, scanned-PDF flagging, and source listing.
+- Include Docker Compose verification because dependency/cache behavior is a major project risk.
 
-**Risk Assessment**
-`MEDIUM`: The verification concept is good, but it needs sharper pass/fail criteria to catch integration gaps.
+**Risk Assessment:** `MEDIUM`; the plan is strong, but test environment determinism needs attention.
 
 ---
 
 ## Consensus Summary
 
-*Single reviewer (Codex) — consensus requires 2+ reviewers.*
+*Single reviewer (Codex) — consensus analysis requires 2+ reviewers.*
 
-### Key Strengths
+### Agreed Strengths
 - Plans are well-structured with clear wave dependencies and requirement tracing
 - Heavy dependency management (docling, PyTorch, Playwright) addressed early in Wave 1
 - CPU-bound work correctly identified for threadpool offloading
 - Security threat model included with STRIDE analysis
+- quality_flags persisted to DB (not transient) — addresses Round 1 HIGH
+- DB-level UNIQUE constraint on content_hash — addresses Round 1 HIGH
+- GET /api/sources endpoint defined — addresses Round 1 HIGH
+- Serial batch ingestion policy explicit — addresses Round 1 MEDIUM
 
-### Top Concerns (by severity)
+### Top Concerns (Round 2)
 
-1. **HIGH — SSRF mitigation under-specified**: URL fetch with Playwright fallback needs stronger safety controls: DNS rebinding defense, redirect cap, max response size, Playwright subresource blocking
-2. **HIGH — Quality flags not persisted**: Scanned PDF and thin content warnings may be transient SSE-only state; need DB columns to persist these
-3. **HIGH — No unique constraint on content_hash**: Service-level dedup check without DB constraint is race-prone
-4. **HIGH — Missing source list API**: Frontend SourceList component needs a GET endpoint to list indexed sources — not defined in any plan
-5. **MEDIUM — SSE lifecycle gaps**: No cancellation handling, no cleanup on client disconnect, no concurrency limits on docling/Playwright work
-6. **MEDIUM — Batch ingest undefined**: How selected search results map to backend endpoints needs explicit definition
+1. **HIGH — SSE import path verification**: `fastapi.sse.EventSourceResponse` needs build-time verification (it exists in FastAPI 0.135.0+ per project constraints)
+2. **HIGH — Playwright SSRF hardening**: DNS rebinding and browser-level navigation bypasses need explicit attention beyond current route blocking
+3. **HIGH — Custom SSE parser robustness**: Frontend's manual fetch+ReadableStream parser must handle chunk boundaries, multi-line data fields, stream termination
+4. **MEDIUM — Docling/PyTorch version pinning**: Build-time instability risk without pinned versions
+5. **MEDIUM — Null/empty content_hash edge case**: UNIQUE constraint behavior with NULL values needs explicit handling
+6. **MEDIUM — Environment-conditional test skips**: "Zero skips" gate may be too rigid for Playwright/SearXNG availability
 
-### Actionable Items for Replanning
-- Add `UNIQUE` constraint on `content_hash` in the migration (Plan 01)
-- Persist quality flags (warnings array or dedicated column) in RawSource (Plan 01)
-- Add or reference a `GET /api/sources` endpoint for listing indexed sources (Plan 02)
-- Strengthen SSRF controls with redirect cap, DNS validation, max response size (Plan 02)
-- Add SSE cancellation/cleanup handling in both service and frontend (Plans 02, 03)
-- Replace `pytest.skip` with `pytest.mark.xfail` or add a Plan 04 check that no skips remain (Plans 01, 04)
-- Define batch ingest policy: serial via `/fetch` per selected URL (Plan 03)
-- Add negative test cases to E2E verification (Plan 04)
+### Divergent Views
+*Single reviewer — no divergent views to report.*
+
+### Actionable Items for Planning
+- Verify `fastapi.sse` import at Docker build time (smoke test)
+- Pin docling and PyTorch versions in pyproject.toml
+- Add unit tests for SSE stream utility (fragmented chunks, multi-event payloads)
+- Handle NULL content_hash in UNIQUE constraint (allow multiple NULLs)
+- Add edge case tests: encrypted PDFs, malformed PDFs, DNS rebinding
+- Allow documented environment-gated skips in Plan 04
