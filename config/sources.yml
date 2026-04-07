@@ -1,0 +1,110 @@
+guidelines:
+  - name: Canadian Paediatric Society (CPS)
+    domain: cps.ca
+    base_url: https://cps.ca
+    search_url_pattern: "https://cps.ca/en/search?q={query}"
+    requires_auth: false
+    reliability_tier: authoritative
+    notes: "Practice points, position statements, clinical guidelines for paediatric care"
+  - name: Society of Obstetricians and Gynaecologists of Canada (SOGC)
+    domain: sogc.org
+    base_url: https://sogc.org
+    requires_auth: false
+    reliability_tier: authoritative
+    notes: "Clinical practice guidelines for obstetrics and gynaecology"
+  - name: Choosing Wisely Canada
+    domain: choosingwiselycanada.org
+    base_url: https://choosingwiselycanada.org
+    requires_auth: false
+    reliability_tier: authoritative
+    notes: "Evidence-based recommendations on unnecessary tests and treatments"
+  - name: Alberta Health Services Clinical Knowledge Topics
+    domain: albertahealthservices.ca
+    base_url: https://www.albertahealthservices.ca
+    requires_auth: false
+    reliability_tier: authoritative
+    notes: "Provincial clinical guidelines and order sets"
+  - name: Hypertension Canada
+    domain: hypertension.ca
+    base_url: https://hypertension.ca
+    requires_auth: false
+    reliability_tier: authoritative
+    notes: "Canadian hypertension guidelines"
+  - name: Diabetes Canada
+    domain: diabetes.ca
+    base_url: https://diabetes.ca
+    requires_auth: false
+    reliability_tier: authoritative
+    notes: "Clinical practice guidelines for diabetes management"
+  - name: Thrombosis Canada
+    domain: thrombosiscanada.ca
+    base_url: https://thrombosiscanada.ca
+    requires_auth: false
+    reliability_tier: authoritative
+    notes: "Clinical guides for VTE, anticoagulation management"
+  - name: Canadian Cardiovascular Society
+    domain: ccs.ca
+    base_url: https://ccs.ca
+    requires_auth: false
+    reliability_tier: authoritative
+    notes: "Cardiovascular clinical guidelines"
+
+textbooks:
+  - name: UpToDate
+    domain: uptodate.com
+    base_url: https://www.uptodate.com
+    search_url_pattern: "https://www.uptodate.com/contents/search?search={query}"
+    requires_auth: true
+    reliability_tier: authoritative
+    notes: "Evidence-based clinical decision support. Institutional subscription required."
+  - name: DynaMed
+    domain: dynamed.com
+    base_url: https://www.dynamed.com
+    requires_auth: true
+    reliability_tier: authoritative
+    notes: "Evidence-based clinical reference. Institutional subscription required."
+
+journals:
+  - name: Canadian Medical Association Journal (CMAJ)
+    domain: cmaj.ca
+    base_url: https://www.cmaj.ca
+    requires_auth: false
+    reliability_tier: reference
+    notes: "Open access Canadian medical journal"
+  - name: Canadian Family Physician
+    domain: cfp.ca
+    base_url: https://www.cfp.ca
+    requires_auth: false
+    reliability_tier: reference
+    notes: "Journal of the College of Family Physicians of Canada"
+  - name: NEJM
+    domain: nejm.org
+    base_url: https://www.nejm.org
+    requires_auth: true
+    reliability_tier: reference
+    notes: "New England Journal of Medicine"
+  - name: The Lancet
+    domain: thelancet.com
+    base_url: https://www.thelancet.com
+    requires_auth: true
+    reliability_tier: reference
+  - name: BMJ
+    domain: bmj.com
+    base_url: https://www.bmj.com
+    requires_auth: false
+    reliability_tier: reference
+    notes: "British Medical Journal -- many articles open access"
+
+formularies:
+  - name: Canadian Pharmacists Association (CPhA)
+    domain: pharmacists.ca
+    base_url: https://www.pharmacists.ca
+    requires_auth: true
+    reliability_tier: authoritative
+    notes: "CPS drug monographs and RxTx"
+  - name: Alberta Drug Benefit List
+    domain: alberta.ca
+    base_url: https://www.alberta.ca/drug-benefit-list
+    requires_auth: false
+    reliability_tier: reference
+    notes: "Provincial formulary for Alberta"

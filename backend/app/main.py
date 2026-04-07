@@ -7,6 +7,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import Settings
+from app.health.router import router as health_router
+from app.search.router import router as search_router
+from app.sources.registry import load_source_registry
+from app.sources.router import router as sources_router
 
 logger = logging.getLogger(__name__)
 settings = Settings()
@@ -40,6 +44,14 @@ async def lifespan(app: FastAPI):
     ]:
         os.makedirs(dir_path, exist_ok=True)
         logger.info("Ensured directory exists: %s", dir_path)
+
+    # Load source registry at startup
+    try:
+        registry = load_source_registry(settings.clinic_atlas_sources_file)
+        logger.info("Loaded %d trusted sources from registry", len(registry.all_sources))
+    except Exception as e:
+        logger.warning("Failed to load source registry: %s", e)
+
     yield
 
 
@@ -55,7 +67,6 @@ app.add_middleware(
 )
 
 
-# Minimal health endpoint (expanded in Plan 02)
-@app.get("/api/health")
-async def health():
-    return {"status": "ok"}
+app.include_router(health_router)
+app.include_router(search_router)
+app.include_router(sources_router)
