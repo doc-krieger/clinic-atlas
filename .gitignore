@@ -7,3 +7,6 @@ temp/
 __pycache__/
 .env
 !.env.example
+
+# Docker volume mounts (created by containers at runtime)
+data/
