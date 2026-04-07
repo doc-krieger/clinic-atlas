@@ -368,12 +368,13 @@ def get_converter() -> DocumentConverter:
 
 ### RawSource Schema Extension
 ```python
-# Migration needed: add page_count to raw_sources
+# Migration needed: add page_count, source_type, author to raw_sources
 class RawSource(SQLModel, table=True):
     __tablename__ = "raw_sources"
     # ... existing fields ...
     page_count: Optional[int] = None       # D-04: PDF page count
     source_type: str = Field(default="pdf") # "pdf" | "url" | "search"
+    author: Optional[str] = None           # D-04: extracted from PDF metadata
 ```
 [ASSUMED -- based on D-04 and D-13 requirements]
 
@@ -391,12 +392,13 @@ class IngestionProgress(BaseModel):
 class IngestionComplete(BaseModel):
     id: int
     title: Optional[str]
+    author: Optional[str]  # D-04: extracted from PDF metadata
     parse_status: str
     page_count: Optional[int]
     content_preview: str   # First 500 chars (D-13)
     source_type: str
 ```
-[ASSUMED -- designed from D-12, D-13 requirements]
+[ASSUMED -- designed from D-04, D-12, D-13 requirements]
 
 ### Frontend SSE Consumer
 ```typescript
@@ -446,27 +448,27 @@ await fetchEventSource(`${API_URL}/api/sources/upload`, {
 | # | Claim | Section | Risk if Wrong |
 |---|-------|---------|---------------|
 | A1 | Content hash uses SHA-256 of extracted markdown text | Architecture Pattern 4 | LOW -- any hash works, SHA-256 is standard |
-| A2 | RawSource needs `page_count` and `source_type` columns added via migration | Code Examples | MEDIUM -- if schema differs, migration needs adjustment |
+| A2 | RawSource needs `page_count`, `source_type`, and `author` columns added via migration | Code Examples | MEDIUM -- if schema differs, migration needs adjustment |
 | A3 | `@microsoft/fetch-event-source` is the right library for POST SSE on frontend | Code Examples | MEDIUM -- alternative is manual fetch+ReadableStream, but this library is widely used |
 | A4 | Docling model cache is at `~/.cache/docling/` | Pitfall 3 | LOW -- may be at `~/.cache/huggingface/` instead, volume mount path may need adjustment |
 | A5 | Docling `result.document.pages` dict gives page count | Architecture Pattern 2 | LOW -- verified from Context7 docs showing `for page_no, page in result.document.pages.items()` |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Docling model pre-download strategy**
+1. **Docling model pre-download strategy** -- RESOLVED
    - What we know: Docling downloads ~500 MB of models on first use. Docker volume can cache them.
    - What's unclear: Whether to pre-download in Dockerfile (larger image, faster cold start) or use a volume mount (smaller image, slow first run).
-   - Recommendation: Use a Docker named volume `docling_models:/home/appuser/.cache`. First run is slow, subsequent runs are fast. Avoids bloating the image further.
+   - Resolution: Use a Docker named volume `docling_models:/home/appuser/.cache`. First run is slow, subsequent runs are fast. Avoids bloating the image further. Implemented in Plan 01 Task 1.
 
-2. **`@microsoft/fetch-event-source` vs manual fetch**
+2. **`@microsoft/fetch-event-source` vs manual fetch** -- RESOLVED
    - What we know: Native EventSource is GET-only. POST SSE needs a wrapper.
    - What's unclear: Whether `@microsoft/fetch-event-source` is still maintained and compatible with React 19.
-   - Recommendation: Verify npm package status before installing. Fallback is a ~30-line manual implementation using `fetch()` + `TextDecoderStream`.
+   - Resolution: Use manual `fetch()` + `ReadableStream` implementation (~40 lines in `frontend/src/lib/sse.ts`). Avoids dependency risk. Implemented in Plan 03 Task 1.
 
-3. **Docling thread safety**
+3. **Docling thread safety** -- RESOLVED
    - What we know: `DocumentConverter` is called via `asyncio.to_thread()`. Single-user app.
    - What's unclear: Whether `DocumentConverter` instance is safe to share across threads.
-   - Recommendation: Use a singleton converter (it's stateless after init). If issues arise, create a new instance per request.
+   - Resolution: Use a singleton converter via `@lru_cache` (it's stateless after init). If issues arise, create a new instance per request. Implemented in Plan 02 Task 1.
 
 ## Environment Availability
 
