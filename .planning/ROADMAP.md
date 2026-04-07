@@ -43,7 +43,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. User can submit a URL and see it fetched, extracted, and indexed as a raw source
   3. Uploading a scanned/image-only PDF surfaces a visible flag rather than silently indexing garbage text
   4. SearXNG can be queried for a trusted source domain and returns results
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Backend infrastructure: dependencies, Docker, migration, schemas, test scaffolds
+- [ ] 02-02-PLAN.md — Backend ingestion service, SearXNG client, API endpoints, tests
+- [ ] 02-03-PLAN.md — Frontend sources page with tabs, SSE progress, quality warnings
+- [ ] 02-04-PLAN.md — Integration verification and user acceptance checkpoint
 
 ### Phase 3: LLM Service and Chat
 **Goal**: The physician can send a message and receive a streamed LLM response in real time, with streaming errors surfaced rather than swallowed
@@ -110,7 +116,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-04-07 |
-| 2. Source Ingestion | 0/? | Not started | - |
+| 2. Source Ingestion | 0/4 | Planning complete | - |
 | 3. LLM Service and Chat | 0/? | Not started | - |
 | 4. Research Orchestrator | 0/? | Not started | - |
 | 5. Approval Gate and KB Persistence | 0/? | Not started | - |
