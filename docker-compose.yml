@@ -1,0 +1,94 @@
+services:
+  postgres:
+    image: postgres:17
+    volumes:
+      - ./config/medical_thesaurus.ths:/usr/share/postgresql/17/tsearch_data/medical_thesaurus.ths:ro
+      - ./scripts/init-postgres.sql:/docker-entrypoint-initdb.d/01-fts-config.sql:ro
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: clinic_atlas
+      POSTGRES_USER: clinic_atlas
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-clinic_atlas_dev}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clinic_atlas"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    volumes:
+      - ./backend:/app
+      - ./data/notes:/data/notes
+      - ./data/sources:/data/sources
+      - ./config:/config:ro
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://clinic_atlas:${POSTGRES_PASSWORD:-clinic_atlas_dev}@postgres:5432/clinic_atlas
+      CLINIC_ATLAS_NOTES_DIR: /data/notes
+      CLINIC_ATLAS_SOURCES_DIR: /data/sources
+      CLINIC_ATLAS_SOURCES_FILE: /config/sources.yml
+      OLLAMA_BASE_URL: http://ollama:11434
+      SEARXNG_URL: http://searxng:8080
+    command: uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  frontend:
+    build:
+      context: ./frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    command: pnpm dev --hostname 0.0.0.0
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      OLLAMA_KEEP_ALIVE: "-1"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:11434/api/tags || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  searxng:
+    image: searxng/searxng:latest
+    volumes:
+      - ./config/searxng:/etc/searxng:rw
+    ports:
+      - "8888:8080"
+    environment:
+      SEARXNG_BASE_URL: http://localhost:8888/
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  ollama_data:
