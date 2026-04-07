@@ -1,6 +1,5 @@
 import logging
 import os
-import subprocess
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -18,23 +17,8 @@ settings = Settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Run Alembic migrations on startup
-    # This ensures schema is always up-to-date after `docker compose up`
-    try:
-        result = subprocess.run(
-            ["alembic", "upgrade", "head"],
-            capture_output=True,
-            text=True,
-            cwd=os.path.dirname(os.path.dirname(__file__)),  # backend/ directory
-        )
-        if result.returncode == 0:
-            logger.info("Alembic migrations applied successfully")
-        else:
-            logger.error("Alembic migration failed: %s", result.stderr)
-            raise RuntimeError(f"Alembic migration failed: {result.stderr}")
-    except FileNotFoundError:
-        logger.error("Alembic not found -- cannot verify database schema")
-        raise
+    # Migrations are run by docker-compose command before uvicorn starts.
+    # For non-Docker environments, run `alembic upgrade head` manually.
 
     # D-21: Auto-create directories on startup
     for dir_path in [
