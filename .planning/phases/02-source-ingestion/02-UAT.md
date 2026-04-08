@@ -61,7 +61,7 @@ blocked: 0
 ## Gaps
 
 - truth: "After PDF upload completes, the source list refreshes to show the newly ingested source"
-  status: failed
+  status: fixed
   reason: "Source list does not refresh after PDF upload completion. Only refreshes after clicking 'Upload another' which resets the form. The refreshKey increment likely happens on form reset, not on SSE complete event."
   severity: minor
   test: 3

@@ -12,6 +12,7 @@
 ## PDF Upload Flow
 
 ### Scanned PDF Detection
+
 | Option | Description | Selected |
 |--------|-------------|----------|
 | Text extraction heuristic | Extract text with PyMuPDF — if pages yield < ~50 chars each, flag as scanned. Simple, no extra deps. | |
@@ -22,6 +23,7 @@
 **Notes:** User has experience with docling and finds it produces better extraction than PyMuPDF4LLM even on non-scanned PDFs. After research, decided to use docling as unified parser for both PDF and HTML.
 
 ### Duplicate Handling
+
 | Option | Description | Selected |
 |--------|-------------|----------|
 | Reject with message | Return existing source record. No new row created. | ✓ |
@@ -31,6 +33,7 @@
 **User's choice:** Reject with message (Recommended)
 
 ### File Size Limit
+
 | Option | Description | Selected |
 |--------|-------------|----------|
 | 50 MB limit | Covers clinical guidelines and textbook chapters. | ✓ |
@@ -40,6 +43,7 @@
 **User's choice:** 50 MB limit (Recommended)
 
 ### PDF Metadata
+
 | Option | Description | Selected |
 |--------|-------------|----------|
 | Title + page count + author | Extract from PDF document info dict. | ✓ |
@@ -49,6 +53,7 @@
 **User's choice:** Title + page count + author (Recommended)
 
 ### Parser Choice (follow-up)
+
 | Option | Description | Selected |
 |--------|-------------|----------|
 | PyMuPDF4LLM | Lightweight, fast, already in stack spec. | |
@@ -63,6 +68,7 @@
 ## URL Fetch Behavior
 
 ### Paywalled/Auth Pages
+
 | Option | Description | Selected |
 |--------|-------------|----------|
 | Fetch and flag if thin | Attempt fetch, flag if < 200 chars extracted. | ✓ |
@@ -72,6 +78,7 @@
 **User's choice:** Fetch and flag if thin (Recommended)
 
 ### JS Rendering
+
 | Option | Description | Selected |
 |--------|-------------|----------|
 | HTTP only, follow redirects | httpx follows redirects. No JS. Simple. | |
@@ -82,6 +89,7 @@
 **Notes:** Some clinical knowledge bases (UpToDate, DynaMed) are JavaScript SPAs.
 
 ### URL Title Extraction
+
 | Option | Description | Selected |
 |--------|-------------|----------|
 | Extract from HTML title tag | Docling or raw parse gives page title. | |
@@ -95,6 +103,7 @@
 ## SearXNG Integration
 
 ### Auto-ingest vs User Selection
+
 | Option | Description | Selected |
 |--------|-------------|----------|
 | User picks from results | Show results as list, user selects which to ingest. | ✓ |
@@ -104,6 +113,7 @@
 **User's choice:** User picks from results (Recommended)
 
 ### Domain Scoping
+
 | Option | Description | Selected |
 |--------|-------------|----------|
 | Append site: filters from registry | Build query with site: operators. | |
@@ -117,6 +127,7 @@
 ## Ingestion API Design
 
 ### Processing Model
+
 | Option | Description | Selected |
 |--------|-------------|----------|
 | Synchronous | Parse inline during request. Most PDFs < 5s. | |
@@ -126,6 +137,7 @@
 **User's choice:** Sync with SSE progress
 
 ### Response Format
+
 | Option | Description | Selected |
 |--------|-------------|----------|
 | Full RawSource record | Return created record with id, title, status, page count, content preview. | ✓ |
@@ -135,6 +147,7 @@
 **User's choice:** Full RawSource record (Recommended)
 
 ### Endpoint Structure
+
 | Option | Description | Selected |
 |--------|-------------|----------|
 | Separate endpoints | POST /upload, POST /fetch, POST /search. Different input shapes. | ✓ |

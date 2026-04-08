@@ -113,7 +113,7 @@ None - frontend-only changes, no external service configuration.
 - All frontend components ready for integration with backend API endpoints (Plan 02)
 - SSE client utility ready for real-time progress streaming
 - Source list connected to GET /api/sources endpoint
-- Plan 04 verification can test full stack integration
+- Plan 04 verification can test full-stack integration
 
 ---
 *Phase: 02-source-ingestion*
