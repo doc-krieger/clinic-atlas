@@ -107,7 +107,6 @@ export function PdfUploadTab({ onSourceAdded }: PdfUploadTabProps) {
     setState("idle")
     setProgress(null)
     setErrorMessage("")
-    setCompleteData(null)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
