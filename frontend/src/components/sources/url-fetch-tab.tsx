@@ -62,6 +62,8 @@ export function UrlFetchTab({ onSourceAdded }: UrlFetchTabProps) {
         {
           onProgress: (data) => setProgress(data),
           onComplete: (data) => {
+            // Always refresh source list -- source was stored regardless of warnings
+            onSourceAdded()
             if (data.quality_flags.includes("thin_content")) {
               setState("warning")
               setWarningMessage(
@@ -70,10 +72,8 @@ export function UrlFetchTab({ onSourceAdded }: UrlFetchTabProps) {
             } else if (data.quality_flags.includes("js_fallback_used")) {
               // JS fallback was used but content is OK
               setState("complete")
-              onSourceAdded()
             } else {
               setState("complete")
-              onSourceAdded()
             }
           },
           onError: (error) => {
@@ -151,10 +151,7 @@ export function UrlFetchTab({ onSourceAdded }: UrlFetchTabProps) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              onSourceAdded()
-              handleReset()
-            }}
+            onClick={handleReset}
           >
             Fetch another
           </Button>
