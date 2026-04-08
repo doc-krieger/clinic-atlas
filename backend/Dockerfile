@@ -20,6 +20,8 @@ COPY pyproject.toml uv.lock* ./
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev
 
 # Install Playwright Chromium browser binary (D-08 JS fallback)
+# Use shared path so non-root user can access browsers installed during build
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright-browsers
 RUN uv run playwright install chromium
 
 # Copy application code

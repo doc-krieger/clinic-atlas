@@ -107,7 +107,9 @@ class SSRFSafeTransport(httpx.AsyncHTTPTransport):
         hostname = request.url.host
         if hostname:
             try:
-                ip = ipaddress.ip_address(socket.gethostbyname(hostname))
+                # Run DNS lookup in threadpool to avoid blocking the event loop
+                resolved = await asyncio.to_thread(socket.gethostbyname, hostname)
+                ip = ipaddress.ip_address(resolved)
             except (socket.gaierror, ValueError) as e:
                 raise UnsafeURLError(f"Cannot resolve hostname: {hostname}") from e
             _validate_ip_is_public(ip)
@@ -170,7 +172,7 @@ def _complete_event(
 
 
 async def parse_pdf(
-    file_path: Path,
+    file_path: str | Path,
     filename: str,
     session: Session,
     settings: Settings,
@@ -376,10 +378,10 @@ async def fetch_and_parse_url(
                     # T-02-09: Block subresource requests to non-target hosts
                     async def _route_handler(route):
                         req_host = urlparse(route.request.url).hostname
-                        if req_host == target_host:
-                            await route.continue_()
-                        else:
+                        if not req_host or req_host != target_host:
                             await route.abort()
+                        else:
+                            await route.continue_()
 
                     await context.route("**/*", _route_handler)
                     page = await context.new_page()
@@ -401,7 +403,8 @@ async def fetch_and_parse_url(
 
                 if len(new_markdown) >= 200:
                     markdown = new_markdown
-                    quality_flags.remove("thin_content")
+                    if "thin_content" in quality_flags:
+                        quality_flags.remove("thin_content")
                     quality_flags.append("js_fallback_used")
                 else:
                     # Still thin -- keep thin_content flag, use longer version if available

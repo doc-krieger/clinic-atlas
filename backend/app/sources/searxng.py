@@ -45,12 +45,12 @@ async def search_searxng(
         return []
 
     # D-11: Post-filter to trusted domains only
-    trusted = {d.lstrip("www.") for d in domains}
+    trusted = {d.removeprefix("www.") for d in domains}
     results: list[SearchResult] = []
 
     for r in data.get("results", []):
         url = r.get("url", "")
-        domain = urlparse(url).netloc.lstrip("www.")
+        domain = urlparse(url).netloc.removeprefix("www.")
         if domain in trusted:
             results.append(
                 SearchResult(
