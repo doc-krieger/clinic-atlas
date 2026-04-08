@@ -42,23 +42,17 @@ def upgrade() -> None:
     )
 
     # Add UNIQUE constraint on content_hash (T-02-08: prevents duplicate rows at DB level)
-    # Drop existing index first since we'll create a unique constraint that implies an index
+    # Drop existing index first since we'll create a unique constraint that implies an index.
+    # No need to re-create a separate index -- Postgres creates an implicit unique index
+    # for the constraint, which is sufficient for both uniqueness and query performance.
     op.drop_index("ix_raw_sources_content_hash", table_name="raw_sources")
     op.create_unique_constraint(
         "uq_raw_sources_content_hash", "raw_sources", ["content_hash"]
     )
-    # Re-create as unique index for query performance
-    op.create_index(
-        "ix_raw_sources_content_hash",
-        "raw_sources",
-        ["content_hash"],
-        unique=True,
-    )
 
 
 def downgrade() -> None:
-    # Drop unique index and constraint
-    op.drop_index("ix_raw_sources_content_hash", table_name="raw_sources")
+    # Drop unique constraint (also removes implicit index)
     op.drop_constraint("uq_raw_sources_content_hash", "raw_sources", type_="unique")
     # Re-create original non-unique index
     op.create_index("ix_raw_sources_content_hash", "raw_sources", ["content_hash"])
