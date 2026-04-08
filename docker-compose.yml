@@ -26,6 +26,7 @@ services:
       - ./data/notes:/data/notes
       - ./data/sources:/data/sources
       - ./config:/config:ro
+      - docling_models:/home/appuser/.cache
     ports:
       - "8000:8000"
     environment:
@@ -35,7 +36,8 @@ services:
       CLINIC_ATLAS_SOURCES_FILE: /config/sources.yml
       OLLAMA_BASE_URL: http://ollama:11434
       SEARXNG_URL: http://searxng:8080
-    command: sh -c "uv run alembic upgrade head && exec uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    user: root
+    command: sh -c "chown -R appuser:appgroup /data/notes /data/sources 2>/dev/null; exec su -s /bin/sh appuser -c 'uv run alembic upgrade head && exec uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload'"
     depends_on:
       postgres:
         condition: service_healthy
@@ -93,3 +95,4 @@ services:
 volumes:
   postgres_data:
   ollama_data:
+  docling_models:

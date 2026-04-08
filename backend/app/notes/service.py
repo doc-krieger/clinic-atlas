@@ -61,9 +61,7 @@ def reindex_from_disk(session: Session, notes_dir: str) -> dict:
                             title=post.metadata.get("title", slug),
                             content=post.content,
                             type=note_type,
-                            status=NoteStatus(
-                                post.metadata.get("status", "draft")
-                            ),
+                            status=NoteStatus(post.metadata.get("status", "draft")),
                             tags=post.metadata.get("tags", []),
                             version=post.metadata.get("version", 1),
                         )

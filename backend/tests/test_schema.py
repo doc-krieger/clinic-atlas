@@ -52,6 +52,10 @@ def test_raw_sources_table_has_expected_columns(session: Session):
         "content_hash",
         "mime_type",
         "parse_status",
+        "page_count",
+        "source_type",
+        "author",
+        "quality_flags",
         "created_at",
         "updated_at",
         "search_vector",
@@ -90,11 +94,15 @@ def test_gin_indexes_exist(session: Session):
     )
     indexes = {row[0]: row[1] for row in result}
     assert "idx_notes_search" in indexes, "Missing GIN index on notes.search_vector"
-    assert "idx_raw_sources_search" in indexes, "Missing GIN index on raw_sources.search_vector"
-    assert "using gin" in indexes["idx_notes_search"].lower(), \
+    assert "idx_raw_sources_search" in indexes, (
+        "Missing GIN index on raw_sources.search_vector"
+    )
+    assert "using gin" in indexes["idx_notes_search"].lower(), (
         "idx_notes_search is not a GIN index"
-    assert "using gin" in indexes["idx_raw_sources_search"].lower(), \
+    )
+    assert "using gin" in indexes["idx_raw_sources_search"].lower(), (
         "idx_raw_sources_search is not a GIN index"
+    )
 
 
 def test_research_sessions_table_has_expected_columns(session: Session):

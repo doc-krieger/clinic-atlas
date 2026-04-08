@@ -37,9 +37,9 @@ def test_htn_expands_to_hypertension(session: Session):
     )
     results = search_notes(session, "htn")
     assert len(results) > 0, "HTN search should find hypertension note via thesaurus"
-    assert any(
-        "hypertension" in r["title"].lower() for r in results
-    ), "Result should include hypertension note"
+    assert any("hypertension" in r["title"].lower() for r in results), (
+        "Result should include hypertension note"
+    )
 
 
 def test_plainto_tsquery_medical_config_htn(session: Session):

@@ -3,7 +3,8 @@
 .opencode/
 .playwright/
 .playwright-mcp/
-temp/
+.playwright-cli/
+.temp/
 __pycache__/
 .env
 !.env.example

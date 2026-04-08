@@ -110,7 +110,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-04-07 |
-| 2. Source Ingestion | 0/? | Not started | - |
+| 2. Source Ingestion | 4/4 | Complete | 2026-04-07 |
 | 3. LLM Service and Chat | 0/? | Not started | - |
 | 4. Research Orchestrator | 0/? | Not started | - |
 | 5. Approval Gate and KB Persistence | 0/? | Not started | - |

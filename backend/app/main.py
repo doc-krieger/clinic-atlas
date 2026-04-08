@@ -33,7 +33,9 @@ async def lifespan(app: FastAPI):
     # Load source registry at startup
     try:
         registry = load_source_registry(settings.clinic_atlas_sources_file)
-        logger.info("Loaded %d trusted sources from registry", len(registry.all_sources))
+        logger.info(
+            "Loaded %d trusted sources from registry", len(registry.all_sources)
+        )
     except Exception as e:
         logger.warning("Failed to load source registry: %s", e)
 

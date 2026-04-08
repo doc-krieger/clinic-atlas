@@ -13,6 +13,8 @@ dependencies = [
     "httpx>=0.28.0",
     "litellm>=1.83.0",
     "psycopg2-binary>=2.9.0",
+    "docling>=2.85.0",
+    "playwright>=1.52.0",
 ]
 
 [tool.pytest.ini_options]
@@ -26,3 +28,12 @@ dev = [
     "pytest-asyncio>=0.25.0",
     "ruff>=0.15.0",
 ]
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+torchvision = [{ index = "pytorch-cpu" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
