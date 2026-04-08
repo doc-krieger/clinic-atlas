@@ -54,6 +54,7 @@ export function Sidebar() {
       <nav className="flex-1 px-4 py-4 space-y-1">
         <Link
           href="/chat"
+          aria-current={pathname === "/chat" ? "page" : undefined}
           className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm ${
             pathname === "/chat"
               ? "bg-accent text-accent-foreground"
@@ -65,6 +66,7 @@ export function Sidebar() {
         </Link>
         <Link
           href="/sources"
+          aria-current={pathname === "/sources" ? "page" : undefined}
           className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm ${
             pathname === "/sources"
               ? "bg-accent text-accent-foreground"

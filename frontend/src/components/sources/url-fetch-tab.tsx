@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { postSSE } from "@/lib/sse"
@@ -31,6 +31,13 @@ export function UrlFetchTab({ onSourceAdded }: UrlFetchTabProps) {
   const [errorMessage, setErrorMessage] = useState("")
   const [warningMessage, setWarningMessage] = useState("")
   const abortControllerRef = useRef<AbortController | null>(null)
+
+  // Abort in-flight request on unmount to prevent state updates on unmounted component
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort()
+    }
+  }, [])
 
   const handleBlur = () => {
     if (url && !isValidUrl(url)) {

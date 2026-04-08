@@ -21,6 +21,7 @@ export function SearchTab({ onSourceAdded }: SearchTabProps) {
   const [ingestionState, setIngestionState] = useState<
     Map<string, "pending" | "ingesting" | "done" | "warning" | "error">
   >(new Map())
+  const [searchError, setSearchError] = useState("")
   const [ingestionProgress, setIngestionProgress] = useState<{
     current: number
     total: number
@@ -38,6 +39,7 @@ export function SearchTab({ onSourceAdded }: SearchTabProps) {
     setIngestionState(new Map())
     setIngestionProgress(null)
     setSearchDone(false)
+    setSearchError("")
 
     try {
       const res = await fetch(`${API_URL}/api/sources/search`, {
@@ -50,9 +52,11 @@ export function SearchTab({ onSourceAdded }: SearchTabProps) {
         setResults(data.results || [])
       } else {
         setResults([])
+        setSearchError("Search failed. Please try again.")
       }
     } catch {
       setResults([])
+      setSearchError("Could not reach the search service. Is SearXNG running?")
     } finally {
       setSearchLoading(false)
       setSearchDone(true)
@@ -126,7 +130,11 @@ export function SearchTab({ onSourceAdded }: SearchTabProps) {
         </div>
       )}
 
-      {!searchLoading && searchDone && results.length === 0 && (
+      {searchError && (
+        <p className="text-sm text-destructive py-4">{searchError}</p>
+      )}
+
+      {!searchLoading && searchDone && !searchError && results.length === 0 && (
         <p className="text-sm text-muted-foreground py-4">
           No results found. Try different search terms.
         </p>

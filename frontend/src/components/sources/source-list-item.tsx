@@ -21,6 +21,7 @@ interface SourceListItemProps {
 function formatRelativeTime(dateStr: string): string {
   const now = Date.now()
   const date = new Date(dateStr).getTime()
+  if (isNaN(date)) return "unknown"
   const diffMs = now - date
   const diffMin = Math.floor(diffMs / 60000)
   const diffHours = Math.floor(diffMs / 3600000)
@@ -28,8 +29,8 @@ function formatRelativeTime(dateStr: string): string {
 
   if (diffMin < 1) return "just now"
   if (diffMin < 60) return `${diffMin} min ago`
-  if (diffHours < 24) return `${diffHours} hours ago`
-  return `${diffDays} days ago`
+  if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`
+  return `${diffDays} ${diffDays === 1 ? "day" : "days"} ago`
 }
 
 function typeBadgeLabel(sourceType: string): string {

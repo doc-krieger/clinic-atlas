@@ -96,8 +96,11 @@ export async function postSSE(
           else if (eventType === "complete") callbacks.onComplete?.(parsed)
           else if (eventType === "error" || eventType === "duplicate")
             callbacks.onError?.(parsed.error, parsed.existing_source_id)
-        } catch {
-          // Skip malformed JSON frames
+        } catch (e) {
+          // Skip malformed JSON frames — log in dev for debugging
+          if (process.env.NODE_ENV === "development") {
+            console.warn("Malformed SSE frame (JSON parse failed):", data, e)
+          }
         }
       }
     }

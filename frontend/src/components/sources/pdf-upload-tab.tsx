@@ -4,7 +4,7 @@ import { useRef, useState, useCallback } from "react"
 import { Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { postSSE } from "@/lib/sse"
-import type { IngestionProgress, IngestionComplete } from "@/lib/sse"
+import type { IngestionProgress } from "@/lib/sse"
 import { IngestionProgressDisplay } from "./ingestion-progress"
 import { QualityWarning } from "./quality-warning"
 
@@ -18,7 +18,6 @@ export function PdfUploadTab({ onSourceAdded }: PdfUploadTabProps) {
   const [state, setState] = useState<UploadState>("idle")
   const [progress, setProgress] = useState<IngestionProgress | null>(null)
   const [errorMessage, setErrorMessage] = useState("")
-  const [, setCompleteData] = useState<IngestionComplete | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
@@ -35,7 +34,7 @@ export function PdfUploadTab({ onSourceAdded }: PdfUploadTabProps) {
       setState("uploading")
       setProgress(null)
       setErrorMessage("")
-      setCompleteData(null)
+
 
       const controller = new AbortController()
       abortControllerRef.current = controller
@@ -50,7 +49,6 @@ export function PdfUploadTab({ onSourceAdded }: PdfUploadTabProps) {
           {
             onProgress: (data) => setProgress(data),
             onComplete: (data) => {
-              setCompleteData(data)
               onSourceAdded()
               if (data.quality_flags.includes("scanned_pdf")) {
                 setState("warning")
@@ -180,10 +178,7 @@ export function PdfUploadTab({ onSourceAdded }: PdfUploadTabProps) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              onSourceAdded()
-              handleReset()
-            }}
+            onClick={handleReset}
           >
             Upload another
           </Button>
