@@ -1,4 +1,4 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl
 from typing import Optional
 
 
@@ -30,7 +30,7 @@ class UrlFetchRequest(BaseModel):
 
 class SearchRequest(BaseModel):
     query: str
-    limit: int = 10
+    limit: int = Field(default=10, ge=1, le=50)
 
 
 # SearXNG result model (D-10)
