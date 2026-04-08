@@ -3,7 +3,7 @@ status: complete
 phase: 02-source-ingestion
 source: [02-01-SUMMARY.md, 02-02-SUMMARY.md, 02-03-SUMMARY.md, 02-04-SUMMARY.md]
 started: 2026-04-07T22:00:00Z
-updated: 2026-04-07T23:45:00Z
+updated: 2026-04-08T02:22:00Z
 ---
 
 ## Current Test
@@ -22,10 +22,8 @@ result: pass
 
 ### 3. Upload a PDF
 expected: On the Upload PDF tab, drag a PDF file onto the drop zone (or click to pick a file). SSE progress appears showing stages (uploading, parsing, indexing). On completion, the source appears in the source list below with a PDF type badge and "complete" status.
-result: issue (fixed)
-reported: "PDF upload completes successfully (progress bar shows 'Source indexed', scanned PDF warning displayed correctly), but the source list does not refresh to show the new source. List only refreshes after clicking 'Upload another' which resets the upload form. The refreshKey pattern triggers on form reset, not on ingestion completion."
-severity: minor
-fix: "cb6c70f — onSourceAdded() now called unconditionally before quality_flags check"
+result: pass (re-tested)
+retest_note: "Originally failed — source list didn't auto-refresh after upload. Fixed in cb6c70f. Re-tested via Playwright automation: uploaded anxiety_pathway.pdf, source list refreshed automatically showing new entry at top with PDF badge and 'Indexed' status. No manual refresh needed."
 
 ### 4. Duplicate PDF Detection
 expected: Upload the same PDF again. An error is shown indicating the source already exists (duplicate detected via content hash).
@@ -54,8 +52,8 @@ result: pass
 ## Summary
 
 total: 9
-passed: 8
-issues: 1
+passed: 9
+issues: 0
 pending: 0
 skipped: 0
 blocked: 0
