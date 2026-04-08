@@ -127,6 +127,8 @@ async def upload_pdf(
     try:
         content = await file.read()
     except Exception:
+        os.close(tmp_fd)
+        os.unlink(tmp_path)
         raise HTTPException(status_code=400, detail="Failed to read uploaded file.")
 
     # Double-check size after reading (in case file.size was not set)
