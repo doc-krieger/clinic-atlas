@@ -25,7 +25,7 @@ class RawSource(SQLModel, table=True):
     source_type: str = Field(default="pdf")  # "pdf" | "url" | "search"
     author: Optional[str] = None  # D-04: extracted from PDF metadata
     quality_flags: list[str] = Field(
-        default=[],
+        default_factory=list,
         sa_column=Column(JSON, nullable=False, server_default="[]"),
     )
     # Persisted warnings: ["scanned_pdf", "thin_content", "js_fallback_used"]
