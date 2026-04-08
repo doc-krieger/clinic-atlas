@@ -40,7 +40,7 @@ export function UrlFetchTab({ onSourceAdded }: UrlFetchTabProps) {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!isValidUrl(url)) {
       setUrlError("Enter a valid URL.")
