@@ -60,6 +60,12 @@ class UnsafeURLError(Exception):
     pass
 
 
+def _validate_ip_is_public(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> None:
+    """Raise UnsafeURLError if IP is private, loopback, link-local, or reserved."""
+    if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
+        raise UnsafeURLError(f"URL resolves to non-public IP: {ip}")
+
+
 def validate_url_safety(url: str) -> None:
     """Validate URL is safe to fetch. Raises UnsafeURLError on failure.
 
@@ -67,6 +73,9 @@ def validate_url_safety(url: str) -> None:
     - Scheme allowlist (http/https only)
     - DNS resolution to non-private IP
     - Blocks loopback, link-local, and reserved addresses
+
+    NOTE: This is a pre-flight check. Use SSRFSafeTransport for connection-time
+    validation to prevent DNS rebinding (TOCTOU) attacks.
     """
     parsed = urlparse(url)
 
@@ -84,9 +93,25 @@ def validate_url_safety(url: str) -> None:
     except (socket.gaierror, ValueError) as e:
         raise UnsafeURLError(f"Cannot resolve hostname: {hostname}") from e
 
-    # Block private/loopback/link-local/reserved IPs
-    if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
-        raise UnsafeURLError(f"URL resolves to non-public IP: {ip}")
+    _validate_ip_is_public(ip)
+
+
+class SSRFSafeTransport(httpx.AsyncHTTPTransport):
+    """Custom transport that validates resolved IPs at connection time.
+
+    Prevents DNS rebinding (TOCTOU) attacks by checking every connection
+    attempt — including redirects — against the private IP blocklist.
+    """
+
+    async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+        hostname = request.url.host
+        if hostname:
+            try:
+                ip = ipaddress.ip_address(socket.gethostbyname(hostname))
+            except (socket.gaierror, ValueError) as e:
+                raise UnsafeURLError(f"Cannot resolve hostname: {hostname}") from e
+            _validate_ip_is_public(ip)
+        return await super().handle_async_request(request)
 
 
 # ---------------------------------------------------------------------------
@@ -274,21 +299,20 @@ async def fetch_and_parse_url(
 
         yield _progress_event("fetching", "Fetching...")
 
-        # Fetch with httpx
+        # Fetch with httpx using SSRFSafeTransport to validate IPs at connection
+        # time (including redirects), preventing DNS rebinding attacks.
         async with httpx.AsyncClient(
+            transport=SSRFSafeTransport(),
             timeout=settings.httpx_timeout,
             follow_redirects=True,
             max_redirects=settings.max_redirects,
         ) as client:
-            resp = await client.get(url, headers={"User-Agent": "ClinicAtlas/1.0"})
-            resp.raise_for_status()
-
-        # Post-redirect SSRF check (T-02-03: catches DNS rebinding)
-        try:
-            validate_url_safety(str(resp.url))
-        except UnsafeURLError as e:
-            yield _error_event(error=f"Redirect destination unsafe: {e}")
-            return
+            try:
+                resp = await client.get(url, headers={"User-Agent": "ClinicAtlas/1.0"})
+                resp.raise_for_status()
+            except UnsafeURLError as e:
+                yield _error_event(error=f"Connection blocked (SSRF): {e}")
+                return
 
         # Enforce max response size (T-02-10)
         if len(resp.content) > settings.max_response_size_mb * 1024 * 1024:
